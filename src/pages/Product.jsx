@@ -135,7 +135,9 @@ const Product = () => {
         ? product.media_gallery
         : [{ url: 'https://placehold.co/600x600?text=No+Image', label: 'No Image' }];
 
-    const price = product.price_range.minimum_price.regular_price;
+    const regularPrice = product.price_range.minimum_price.regular_price;
+    const finalPrice = product.price_range.minimum_price.final_price;
+    const hasDiscount = finalPrice && finalPrice.value < regularPrice.value;
 
     // Determine the image to display: User selected OR First available
     const mainImage = selectedImage || images[0].url;
@@ -239,8 +241,21 @@ const Product = () => {
                             Sign up for price alert
                         </div>
 
-                        <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#333', marginBottom: '10px' }}>
-                            {price.currency} {price.value.toFixed(2)}
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '15px', marginBottom: '10px' }}>
+                            {hasDiscount ? (
+                                <>
+                                    <span style={{ fontSize: '1.5rem', color: '#888', textDecoration: 'line-through' }}>
+                                        {regularPrice.currency} {regularPrice.value.toFixed(2)}
+                                    </span>
+                                    <span style={{ fontSize: '2.5rem', fontWeight: '700', color: '#d32f2f' }}>
+                                        {finalPrice.currency} {finalPrice.value.toFixed(2)}
+                                    </span>
+                                </>
+                            ) : (
+                                <span style={{ fontSize: '2.5rem', fontWeight: '700', color: '#333' }}>
+                                    {regularPrice.currency} {regularPrice.value.toFixed(2)}
+                                </span>
+                            )}
                         </div>
 
                         <div style={{ fontSize: '0.9rem', marginBottom: '8px', color: '#666' }}>

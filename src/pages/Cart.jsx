@@ -15,7 +15,10 @@ const Cart = () => {
     const { cartItems, removeFromCart, addToCart } = useCart();
 
     const subtotal = cartItems.reduce((acc, item) => {
-        return acc + (item.product.price_range.minimum_price.regular_price.value * item.quantity);
+        const regularPrice = item.product.price_range.minimum_price.regular_price.value;
+        const finalPriceNode = item.product.price_range.minimum_price.final_price;
+        const currentPrice = (finalPriceNode && finalPriceNode.value < regularPrice) ? finalPriceNode.value : regularPrice;
+        return acc + (currentPrice * item.quantity);
     }, 0);
 
     const total = subtotal; // Can add tax/shipping logic later if needed
@@ -105,12 +108,28 @@ const Cart = () => {
 
                                 {/* Price */}
                                 <div style={{ textAlign: 'right', minWidth: '100px' }}>
-                                    <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#1a1a1a' }}>
-                                        ${(item.product.price_range.minimum_price.regular_price.value * item.quantity).toFixed(2)}
-                                    </div>
-                                    <div style={{ fontSize: '13px', color: '#888' }}>
-                                        ${item.product.price_range.minimum_price.regular_price.value.toFixed(2)} each
-                                    </div>
+                                    {(() => {
+                                        const regularPrice = item.product.price_range.minimum_price.regular_price.value;
+                                        const finalPriceNode = item.product.price_range.minimum_price.final_price;
+                                        const currentPrice = (finalPriceNode && finalPriceNode.value < regularPrice) ? finalPriceNode.value : regularPrice;
+                                        const isDiscounted = currentPrice < regularPrice;
+
+                                        return (
+                                            <>
+                                                {isDiscounted && (
+                                                    <div style={{ fontSize: '1rem', color: '#888', textDecoration: 'line-through' }}>
+                                                        ${(regularPrice * item.quantity).toFixed(2)}
+                                                    </div>
+                                                )}
+                                                <div style={{ fontSize: '1.25rem', fontWeight: '800', color: isDiscounted ? '#d32f2f' : '#1a1a1a' }}>
+                                                    ${(currentPrice * item.quantity).toFixed(2)}
+                                                </div>
+                                                <div style={{ fontSize: '13px', color: '#888' }}>
+                                                    ${currentPrice.toFixed(2)} each
+                                                </div>
+                                            </>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         ))}

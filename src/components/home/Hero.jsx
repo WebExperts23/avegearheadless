@@ -93,9 +93,22 @@ const Hero = () => {
                                 overflow: 'hidden'
                             }}>{product.name}</p>
 
-                            <p style={{ fontSize: '0.95rem', fontWeight: '800', color: '#333', margin: '0 0 15px' }}>
-                                {product.price_range.minimum_price.regular_price.currency} {product.price_range.minimum_price.regular_price.value.toFixed(2)}
-                            </p>
+                            <div style={{ margin: '0 0 15px' }}>
+                                {product.price_range.minimum_price.final_price && product.price_range.minimum_price.final_price.value < product.price_range.minimum_price.regular_price.value ? (
+                                    <>
+                                        <span style={{ fontSize: '0.85rem', color: '#888', textDecoration: 'line-through', marginRight: '8px' }}>
+                                            {product.price_range.minimum_price.regular_price.currency} {product.price_range.minimum_price.regular_price.value.toFixed(2)}
+                                        </span>
+                                        <span style={{ fontSize: '0.95rem', fontWeight: '800', color: '#d32f2f' }}>
+                                            {product.price_range.minimum_price.final_price.currency} {product.price_range.minimum_price.final_price.value.toFixed(2)}
+                                        </span>
+                                    </>
+                                ) : (
+                                    <span style={{ fontSize: '0.95rem', fontWeight: '800', color: '#333' }}>
+                                        {product.price_range.minimum_price.regular_price.currency} {product.price_range.minimum_price.regular_price.value.toFixed(2)}
+                                    </span>
+                                )}
+                            </div>
 
                             <button
                                 onClick={() => addToCart(product)}

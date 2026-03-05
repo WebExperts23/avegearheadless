@@ -15,6 +15,10 @@ export const GET_PRODUCTS = gql`
               value
               currency
             }
+            final_price {
+              value
+              currency
+            }
           }
         }
         small_image {
@@ -66,6 +70,10 @@ export const GET_PRODUCT_DETAIL = gql`
               value
               currency
             }
+            final_price {
+              value
+              currency
+            }
           }
         }
         media_gallery {
@@ -89,6 +97,10 @@ export const GET_CATEGORY_PRODUCTS = gql`
         price_range {
           minimum_price {
             regular_price {
+              value
+              currency
+            }
+            final_price {
               value
               currency
             }

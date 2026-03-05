@@ -57,9 +57,24 @@ const Search = () => {
                                     <h3 style={{ fontSize: '1rem', marginBottom: '10px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                                         {product.name}
                                     </h3>
-                                    <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#333', marginTop: 'auto', marginBottom: '15px' }}>
-                                        {product.price_range.minimum_price.regular_price.currency} {product.price_range.minimum_price.regular_price.value.toFixed(2)}
-                                    </div>
+                                    {(() => {
+                                        const regularPrice = product.price_range.minimum_price.regular_price.value;
+                                        const finalPriceNode = product.price_range.minimum_price.final_price;
+                                        const currentPrice = (finalPriceNode && finalPriceNode.value < regularPrice) ? finalPriceNode.value : regularPrice;
+                                        const isDiscounted = currentPrice < regularPrice;
+                                        return (
+                                            <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginTop: 'auto', marginBottom: '15px' }}>
+                                                {isDiscounted && (
+                                                    <span style={{ fontSize: '0.9rem', color: '#888', textDecoration: 'line-through', marginRight: '8px', fontWeight: 'normal' }}>
+                                                        {product.price_range.minimum_price.regular_price.currency} {regularPrice.toFixed(2)}
+                                                    </span>
+                                                )}
+                                                <span style={{ color: isDiscounted ? '#d32f2f' : '#333' }}>
+                                                    {product.price_range.minimum_price.regular_price.currency} {currentPrice.toFixed(2)}
+                                                </span>
+                                            </div>
+                                        );
+                                    })()}
                                 </Link>
                                 <button
                                     onClick={() => addToCart(product)}

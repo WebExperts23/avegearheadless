@@ -8,7 +8,6 @@ import Features from '../components/home/Features';
 import PromoBanner from '../components/home/PromoBanner';
 import ProductCard from '../components/catalog/ProductCard';
 
-
 const Home = () => {
     // Fetch products for featured sections
     const { loading: promoLoading, data: promoData } = useQuery(GET_PRODUCTS, {

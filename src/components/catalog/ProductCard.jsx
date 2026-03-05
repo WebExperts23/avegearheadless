@@ -9,7 +9,9 @@ const ProductCard = ({ product }) => {
     // Diagnostic log to catch SKU/Name mismatch
     console.log(`[ProductCardDebug] Rendering: name="${name}", sku="${sku}"`);
 
-    const price = price_range.minimum_price.regular_price;
+    const regularPrice = price_range.minimum_price.regular_price;
+    const finalPrice = price_range.minimum_price.final_price;
+    const hasDiscount = finalPrice && finalPrice.value < regularPrice.value;
 
     const [stockQty, setStockQty] = React.useState(null);
     const [isOutOfStock, setIsOutOfStock] = React.useState(product.stock_status === 'OUT_OF_STOCK');
@@ -109,8 +111,21 @@ const ProductCard = ({ product }) => {
                     WebkitBoxOrient: 'vertical',
                     height: '2.8em' // approx 2 lines
                 }}>{name}</h3>
-                <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#111' }}>
-                    {price.currency} {price.value.toFixed(2)}
+                <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    {hasDiscount ? (
+                        <>
+                            <span style={{ textDecoration: 'line-through', color: '#888', fontSize: '0.9rem' }}>
+                                {regularPrice.currency} {regularPrice.value.toFixed(2)}
+                            </span>
+                            <span style={{ color: '#d32f2f' }}>
+                                {finalPrice.currency} {finalPrice.value.toFixed(2)}
+                            </span>
+                        </>
+                    ) : (
+                        <span>
+                            {regularPrice.currency} {regularPrice.value.toFixed(2)}
+                        </span>
+                    )}
                 </div>
             </Link>
 

@@ -168,9 +168,24 @@ const Header = () => {
                                                 </div>
                                                 <div style={{ flex: 1, overflow: 'hidden' }}>
                                                     <div style={{ fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{prod.name}</div>
-                                                    <div style={{ fontSize: '12px', color: 'var(--primary-color)', fontWeight: 'bold' }}>
-                                                        {prod.price_range.minimum_price.regular_price.currency} {prod.price_range.minimum_price.regular_price.value.toFixed(2)}
-                                                    </div>
+                                                    {(() => {
+                                                        const regularPrice = prod.price_range.minimum_price.regular_price.value;
+                                                        const finalPriceNode = prod.price_range.minimum_price.final_price;
+                                                        const currentPrice = (finalPriceNode && finalPriceNode.value < regularPrice) ? finalPriceNode.value : regularPrice;
+                                                        const isDiscounted = currentPrice < regularPrice;
+                                                        return (
+                                                            <div style={{ fontSize: '12px', fontWeight: 'bold', marginTop: '3px' }}>
+                                                                {isDiscounted && (
+                                                                    <span style={{ color: '#888', textDecoration: 'line-through', marginRight: '6px', fontWeight: 'normal' }}>
+                                                                        {prod.price_range.minimum_price.regular_price.currency} {regularPrice.toFixed(2)}
+                                                                    </span>
+                                                                )}
+                                                                <span style={{ color: isDiscounted ? '#d32f2f' : 'var(--primary-color)' }}>
+                                                                    {prod.price_range.minimum_price.regular_price.currency} {currentPrice.toFixed(2)}
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </div>
                                             </Link>
                                         ))}

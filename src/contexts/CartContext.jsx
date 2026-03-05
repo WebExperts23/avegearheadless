@@ -39,6 +39,10 @@ const GET_CART = gql`
                                 value
                                 currency
                             }
+                            final_price {
+                                value
+                                currency
+                            }
                         }
                     }
                 }

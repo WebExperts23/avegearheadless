@@ -120,9 +120,12 @@ const Checkout = () => {
 
     const client = useApolloClient();
 
-    const subtotal = cartItems.reduce((acc, item) =>
-        acc + (item.product.price_range.minimum_price.regular_price.value * item.quantity), 0
-    );
+    const subtotal = cartItems.reduce((acc, item) => {
+        const regularPrice = item.product.price_range.minimum_price.regular_price.value;
+        const finalPriceNode = item.product.price_range.minimum_price.final_price;
+        const currentPrice = (finalPriceNode && finalPriceNode.value < regularPrice) ? finalPriceNode.value : regularPrice;
+        return acc + (currentPrice * item.quantity);
+    }, 0);
     // Flat Rate is usually flatrate_flatrate in Magento
     const shippingCost = step >= 2 ? (form.shippingMethod === 'express' ? 15.00 : 5.00) : 0;
     const total = subtotal + shippingCost;
@@ -305,8 +308,26 @@ const Checkout = () => {
                             <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>{it.product.name}</div>
                             <div style={{ fontSize: '12px', color: '#888' }}>Qty: {it.quantity}</div>
                         </div>
-                        <div style={{ fontWeight: '700', fontSize: '14px' }}>
-                            ${(it.product.price_range.minimum_price.regular_price.value * it.quantity).toFixed(2)}
+                        <div style={{ fontWeight: '700', fontSize: '14px', textAlign: 'right' }}>
+                            {(() => {
+                                const regularPrice = it.product.price_range.minimum_price.regular_price.value;
+                                const finalPriceNode = it.product.price_range.minimum_price.final_price;
+                                const currentPrice = (finalPriceNode && finalPriceNode.value < regularPrice) ? finalPriceNode.value : regularPrice;
+                                const isDiscounted = currentPrice < regularPrice;
+
+                                return (
+                                    <>
+                                        {isDiscounted && (
+                                            <div style={{ fontSize: '12px', color: '#888', textDecoration: 'line-through', fontWeight: 'normal' }}>
+                                                ${(regularPrice * it.quantity).toFixed(2)}
+                                            </div>
+                                        )}
+                                        <div style={{ color: isDiscounted ? '#d32f2f' : 'inherit' }}>
+                                            ${(currentPrice * it.quantity).toFixed(2)}
+                                        </div>
+                                    </>
+                                );
+                            })()}
                         </div>
                     </div>
                 ))}

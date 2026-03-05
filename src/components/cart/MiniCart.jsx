@@ -26,7 +26,10 @@ const MiniCart = () => {
     if (!isCartOpen) return null;
 
     const total = cartItems.reduce((acc, item) => {
-        return acc + (item.product.price_range.minimum_price.regular_price.value * item.quantity);
+        const regularPrice = item.product.price_range.minimum_price.regular_price.value;
+        const finalPriceNode = item.product.price_range.minimum_price.final_price;
+        const currentPrice = (finalPriceNode && finalPriceNode.value < regularPrice) ? finalPriceNode.value : regularPrice;
+        return acc + (currentPrice * item.quantity);
     }, 0);
 
     return (
@@ -70,6 +73,10 @@ const MiniCart = () => {
                                 item.product.media_gallery?.[0]?.url ||
                                 null;
 
+                            const regularPrice = item.product.price_range.minimum_price.regular_price.value;
+                            const finalPriceNode = item.product.price_range.minimum_price.final_price;
+                            const currentPrice = (finalPriceNode && finalPriceNode.value < regularPrice) ? finalPriceNode.value : regularPrice;
+
                             return (
                                 <div key={item.id} style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
                                     <div style={{ width: '80px', height: '80px', background: '#f5f5f5', borderRadius: '8px', overflow: 'hidden', flexShrink: 0 }}>
@@ -87,7 +94,7 @@ const MiniCart = () => {
                                             <span style={{ fontSize: '0.9rem', color: '#666' }}>Qty: {item.quantity}</span>
                                             <span style={{ fontWeight: 'bold' }}>
                                                 {item.product.price_range.minimum_price.regular_price.currency}
-                                                {(item.product.price_range.minimum_price.regular_price.value * item.quantity).toFixed(2)}
+                                                {(currentPrice * item.quantity).toFixed(2)}
                                             </span>
                                         </div>
 
