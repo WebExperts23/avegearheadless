@@ -1,0 +1,265 @@
+.cms-footer-content {
+    background-color: #000;
+    color: #fff;
+    padding: 60px 0 20px 0;
+    font-family: inherit;
+}
+
+/* Base structural containers from Magento */
+.cms-footer-content .footer-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+/* Top Section: 4 Columns Layout */
+.cms-footer-content .pagebuilder-column-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 50px;
+    gap: 30px;
+}
+
+.cms-footer-content .pagebuilder-column {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* Column 1: Logo, Text, Socials */
+.cms-footer-content .pagebuilder-column-group > .pagebuilder-column:first-child {
+    flex: 2;
+    padding-right: 40px;
+}
+
+/* Logo styling from shortcode replacement */
+.cms-footer-content a[href="/"] {
+    display: inline-block;
+}
+
+/* Description Text */
+.cms-footer-content .pagebuilder-column:first-child p {
+    color: #888;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-top: -10px;
+    margin-bottom: 25px;
+    max-width: 300px;
+}
+
+/* Social Icons */
+.cms-footer-content .social-icons-wrapper {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.cms-footer-content .social-icon {
+    color: #fff;
+    font-size: 1.3rem;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.cms-footer-content .social-icon:hover {
+    color: #00a651;
+}
+
+/* Headings in Columns 2, 3, 4 */
+.cms-footer-content .col-heading {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 25px;
+    letter-spacing: 0.5px;
+}
+
+.cms-footer-content .col-heading.hidden {
+    visibility: hidden;
+    margin-bottom: 25px;
+}
+
+/* Links (sub-lines) */
+.cms-footer-content .sub-line {
+    color: #888;
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.cms-footer-content .sub-line:hover {
+    color: #00a651;
+}
+
+
+/* Middle Section: Newsletter (Centered) */
+.cms-footer-content .pagebuilder-column-line {
+    border-top: 1px solid #1a1a1a;
+    padding-top: 50px;
+    margin-top: 20px;
+}
+
+.cms-footer-content .news-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+.cms-footer-content .nesletter-head {
+    font-size: 1.4rem;
+    color: #fff;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.cms-footer-content .news-col > .sub-line {
+    color: #888;
+    margin-bottom: 30px;
+    font-size: 0.9rem;
+}
+
+/* Newsletter Form styling */
+.cms-footer-content .newsletter-form {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 550px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.cms-footer-content .newsletter-form input {
+    background-color: #1a1a1a;
+    border: 1px solid #222;
+    border-radius: 30px;
+    padding: 14px 25px;
+    color: #fff;
+    width: 100%;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.cms-footer-content .newsletter-form input:focus {
+    border-color: #333;
+}
+
+.cms-footer-content .newsletter-form button {
+    background-color: #00c65e;
+    color: #000;
+    border: none;
+    border-radius: 30px;
+    padding: 0 35px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    bottom: 5px;
+}
+
+.cms-footer-content .newsletter-form button:hover {
+    background-color: #00e66d;
+}
+
+
+/* Bottom Section: Copyright & Policy Links */
+.cms-footer-content .pagebuilder-column-line:last-child {
+    border-top: 1px solid #1a1a1a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 30px;
+    padding-bottom: 10px;
+    margin-top: 50px;
+}
+
+.cms-footer-content .footer-copyright-main {
+    flex: 1;
+}
+
+.cms-footer-content .footer-copyright-main .copyrightt,
+.cms-footer-content .footer-copyright-main .sub-line {
+    color: #555;
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+.cms-footer-content .foote-pages-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: flex-end;
+    flex: 2;
+}
+
+.cms-footer-content .foote-pages-list .sub-line {
+    color: #555;
+    font-size: 0.8rem;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+.cms-footer-content .foote-pages-list .sub-line:hover {
+    color: #888;
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+    .cms-footer-content .pagebuilder-column-group {
+        gap: 40px;
+    }
+    .cms-footer-content .pagebuilder-column {
+        min-width: calc(50% - 20px);
+    }
+    .cms-footer-content .pagebuilder-column-group > .pagebuilder-column:first-child {
+        min-width: 100%;
+        padding-right: 0;
+    }
+    .cms-footer-content .col-heading.hidden {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .cms-footer-content .footer-main {
+        padding: 0 20px;
+    }
+    
+    .cms-footer-content .pagebuilder-column {
+        min-width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .cms-footer-content .pagebuilder-column-group {
+        gap: 20px;
+    }
+    
+    .cms-footer-content .newsletter-form {
+        display: block;
+    }
+    
+    .cms-footer-content .newsletter-form button {
+        position: static;
+        width: 100%;
+        margin-top: 15px;
+        padding: 14px 0;
+    }
+    
+    .cms-footer-content .pagebuilder-column-line:last-child {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .cms-footer-content .foote-pages-list {
+        justify-content: center;
+        gap: 15px;
+    }
+}

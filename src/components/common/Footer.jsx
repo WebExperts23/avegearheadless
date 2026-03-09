@@ -1,103 +1,101 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Instagram, Youtube, Send } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { fetchAdminToken } from '../../api/client';
+import './Footer.css';
 
 const Footer = () => {
-    return (
-        <footer style={{ backgroundColor: '#000', color: '#fff', paddingTop: '80px', paddingBottom: '40px', marginTop: '100px' }}>
-            <div className="container">
-                {/* Logo and About */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1.5fr', gap: '40px', marginBottom: '60px' }}>
-                    <div>
-                        <Link to="/" style={{ textDecoration: 'none', color: '#fff', fontSize: '1.8rem', fontWeight: '900', display: 'block', marginBottom: '20px' }}>
-                            AV<span style={{ color: '#00a651' }}>GEAR</span>
-                        </Link>
-                        <p style={{ color: '#888', fontSize: '0.9rem', lineHeight: '1.6', maxWidth: '300px' }}>
-                            The trusted name in premium home audio. Experience the best in sound technology.
-                        </p>
-                        <div style={{ display: 'flex', gap: '15px', marginTop: '25px' }}>
-                            <Facebook size={20} style={{ color: '#888', cursor: 'pointer' }} />
-                            <Twitter size={20} style={{ color: '#888', cursor: 'pointer' }} />
-                            <Instagram size={20} style={{ color: '#888', cursor: 'pointer' }} />
-                            <Youtube size={20} style={{ color: '#888', cursor: 'pointer' }} />
-                        </div>
-                    </div>
+    const [blockContent, setBlockContent] = useState('');
+    const [loading, setLoading] = useState(true);
 
-                    {/* Information Links */}
-                    <div>
-                        <h4 style={{ fontSize: '1.1rem', marginBottom: '25px', color: '#fff' }}>Information</h4>
-                        <ul style={{ listStyle: 'none', padding: 0, fontSize: '0.9rem' }}>
-                            {['About Us', 'Customer Service', 'Sitemap'].map(item => (
-                                <li key={item} style={{ marginBottom: '12px' }}>
-                                    <Link to="#" style={{ color: '#888', textDecoration: 'none' }}>{item}</Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+    useEffect(() => {
+        const fetchFooterBlock = async () => {
+            try {
+                const token = await fetchAdminToken();
+                if (!token) throw new Error("Could not get admin token");
 
-                    {/* Categories Links */}
-                    <div>
-                        <h4 style={{ fontSize: '1.1rem', marginBottom: '25px', color: '#fff' }}>Categories</h4>
-                        <ul style={{ listStyle: 'none', padding: 0, fontSize: '0.9rem' }}>
-                            {['Home Audio & Video', 'Office Products', 'Gaming Products', 'Pro Audio', 'Car & Marine Audio'].map(item => (
-                                <li key={item} style={{ marginBottom: '12px' }}>
-                                    <Link to="#" style={{ color: '#888', textDecoration: 'none' }}>{item}</Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                const searchCriteria = '?searchCriteria[filter_groups][0][filters][0][field]=identifier&searchCriteria[filter_groups][0][filters][0][value]=headless-footer&searchCriteria[filter_groups][0][filters][0][condition_type]=eq';
+                
+                // Use the Vite proxy '/magento-api' to bypass CORS blocks on the Magento REST API
+                const proxyUrl = import.meta.env.DEV ? '' : (import.meta.env.VITE_MAGENTO_BASE_URL || 'https://2fc1869dd5.nxcli.io');
+                const endpoint = import.meta.env.DEV ? '/magento-api' : proxyUrl;
 
-                    {/* Newsletter and Contact */}
-                    <div>
-                        <h4 style={{ fontSize: '1.1rem', marginBottom: '25px', color: '#fff' }}>Stay Updated</h4>
-                        <p style={{ color: '#888', fontSize: '0.9rem', marginBottom: '20px' }}>
-                            Join our community for the latest news and best deals.
-                        </p>
-                        <div style={{ position: 'relative' }}>
-                            <input
-                                type="text"
-                                placeholder="Your email address"
-                                style={{
-                                    width: '100%',
-                                    padding: '12px 15px',
-                                    borderRadius: '30px',
-                                    border: '1px solid #333',
-                                    backgroundColor: 'transparent',
-                                    color: '#fff',
-                                    fontSize: '0.9rem'
-                                }}
-                            />
-                            <button style={{
-                                position: 'absolute',
-                                right: '5px',
-                                top: '5px',
-                                background: '#00a651',
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '36px',
-                                height: '36px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                color: '#fff'
-                            }}>
-                                <Send size={16} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                const response = await fetch(`${endpoint}/rest/V1/cmsBlock/search${searchCriteria}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-                {/* Bottom Bar */}
-                <div style={{ borderTop: '1px solid #222', paddingTop: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', color: '#555' }}>
-                    <p>© 2026 AV Gear. All rights reserved.</p>
-                    <div style={{ display: 'flex', gap: '20px' }}>
-                        <Link to="#" style={{ color: '#555', textDecoration: 'none' }}>Privacy Policy</Link>
-                        <Link to="#" style={{ color: '#555', textDecoration: 'none' }}>Terms of Service</Link>
-                        <Link to="#" style={{ color: '#555', textDecoration: 'none' }}>Orders & Returns</Link>
-                    </div>
-                </div>
+                if (!response.ok) throw new Error("Failed to fetch block");
+                
+                const data = await response.json();
+                if (data.items && data.items.length > 0) {
+                    setBlockContent(data.items[0].content);
+                }
+            } catch (err) {
+                console.error("Error fetching footer block:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFooterBlock();
+    }, []);
+
+    if (loading) {
+        return (
+            <footer style={{ backgroundColor: '#000', color: '#fff', paddingTop: '80px', paddingBottom: '40px', marginTop: '100px', minHeight: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <div className="animate-spin" style={{ width: '30px', height: '30px', border: '3px solid #333', borderTopColor: '#00a651', borderRadius: '50%' }}></div>
+            </footer>
+        );
+    }
+
+    // Decode HTML entities and replace Magento shortcodes
+    const decodedContent = (() => {
+        if (!blockContent) return '';
+        
+        // 1. First, decode the HTML entities that Magento sends (like &lt; &gt; &quot;)
+        const txt = document.createElement("textarea");
+        txt.innerHTML = blockContent;
+        let htmlSnippet = txt.value;
+
+        // 2. Replace the Logo Widget Shortcode.
+        // We use a flexible regex that handles both encoded quotes (&quot;) and regular quotes ("),
+        // as well as any spacing variations.
+        const logoWidgetPattern = /\{\{widget\s+type=(?:&quot;|")Magento\\Cms\\Block\\Widget\\Block(?:&quot;|")[^}]*block_id=(?:&quot;|")78(?:&quot;|")[^}]*\}\}/gi;
+        const logoHtml = `
+            <a href="/" style="text-decoration: none; color: #fff; font-size: 2.2rem; font-weight: 800; display: block; margin-bottom: 20px; letter-spacing: 1px;">
+                AV<span style="color: #00a651;">GEAR</span>
+            </a>
+        `;
+        htmlSnippet = htmlSnippet.replace(logoWidgetPattern, logoHtml);
+
+        // 3. Replace the Newsletter Subscribe Block Shortcode
+        const newsletterBlockPattern = /\{\{block\s+class=(?:&quot;|")Magento\\Newsletter\\Block\\Subscribe(?:&quot;|")[^}]*\}\}/gi;
+        const newsletterHtml = `
+            <div class="newsletter-form">
+                <input type="email" placeholder="Enter your Email Address" />
+                <button type="button">Subscribe</button>
             </div>
+        `;
+        htmlSnippet = htmlSnippet.replace(newsletterBlockPattern, newsletterHtml);
+
+        return htmlSnippet;
+    })();
+
+    return (
+        <footer style={{ backgroundColor: '#000', color: '#fff', margin: 0 }}>
+            {/* Global CMS Footer */}
+            {decodedContent ? (
+                <div 
+                    className="cms-footer-content"
+                    dangerouslySetInnerHTML={{ __html: decodedContent }} 
+                />
+            ) : (
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                    <p>Footer content configured in Admin is missing or empty.</p>
+                </div>
+            )}
         </footer>
     );
 };

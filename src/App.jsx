@@ -18,6 +18,9 @@ const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const Account = lazy(() => import('./pages/Account'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const CmsPage = lazy(() => import('./pages/CmsPage'));
 
 import { BreadcrumbProvider } from './contexts/BreadcrumbContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -48,8 +51,12 @@ function App() {
               <Route path="/blog/:id" element={<PostDetail />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/customer/account/createpassword/" element={<ResetPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/account" element={<Account />} />
               <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/contact-us" element={<CmsPage identifier="contact-us" />} />
             </Routes>
           </Suspense>
         </main>

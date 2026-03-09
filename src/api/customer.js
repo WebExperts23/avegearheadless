@@ -80,3 +80,19 @@ export const CREATE_CUSTOMER = gql`
     }
   }
 `;
+
+export const REQUEST_PASSWORD_RESET_EMAIL = gql`
+  mutation RequestPasswordResetEmail($email: String!) {
+    requestPasswordResetEmail(email: $email)
+  }
+`;
+
+export const RESET_PASSWORD = gql`
+  mutation ResetPassword($email: String!, $resetToken: String!, $newPassword: String!) {
+    resetPassword(
+      email: $email
+      resetPasswordToken: $resetToken
+      newPassword: $newPassword
+    )
+  }
+`;
