@@ -15,7 +15,8 @@ import {
     Heart, BarChart2, Mail,
     Facebook, Twitter, Instagram,
     Bluetooth, Volume2, Monitor, Headphones,
-    Minus, Plus, FileText, Package, Star, Check
+    Minus, Plus, FileText, Package, Star, Check,
+    ChevronDown, ChevronUp
 } from 'lucide-react';
 
 const Product = () => {
@@ -154,14 +155,14 @@ const Product = () => {
                 <div className="skeleton" style={{ width: '150px', height: '1rem' }}></div>
             </div>
             <div className="container" style={{ paddingBottom: '80px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '60px' }}>
-                    <div className="gallery-skeleton">
+                <div className="pdp-main-layout">
+                    <div className="pdp-gallery-section gallery-skeleton">
                         <div className="skeleton skeleton-img"></div>
                         <div style={{ display: 'flex', gap: '15px', marginTop: '20px' }}>
                             {[1, 2, 3, 4].map(i => <div key={i} className="skeleton" style={{ width: '80px', height: '80px', borderRadius: '8px' }}></div>)}
                         </div>
                     </div>
-                    <div className="info-skeleton">
+                    <div className="pdp-info-section info-skeleton">
                         <div className="skeleton skeleton-title"></div>
                         <div className="skeleton" style={{ width: '60%', height: '1rem', marginBottom: '20px' }}></div>
                         <div className="skeleton skeleton-price"></div>
@@ -294,11 +295,11 @@ const Product = () => {
                 structuredData={structuredData}
             />
             <div className="container" style={{ paddingBottom: '80px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr)', gap: '60px', marginBottom: '80px' }}>
+                <div className="pdp-main-layout" style={{ marginBottom: '80px' }}>
 
                     {/* Left: Gallery */}
-                    <div className="gallery-section">
-                        <div style={{
+                    <div className="pdp-gallery-section gallery-section">
+                        <div className="pdp-main-image-container" style={{
                             border: '1px solid #eee',
                             borderRadius: '12px',
                             marginBottom: '20px',
@@ -329,8 +330,8 @@ const Product = () => {
                     </div>
 
                     {/* Right: Info */}
-                    <div className="info-section">
-                        <h1 style={{ fontSize: '2rem', fontWeight: '400', color: '#333', marginBottom: '10px' }}>
+                    <div className="pdp-info-section info-section">
+                        <h1 className="pdp-title" style={{ fontWeight: '400', color: '#333', marginBottom: '10px' }}>
                             {product.name}
                         </h1>
 
@@ -428,7 +429,7 @@ const Product = () => {
                         </div>
 
                         {/* Add to Cart Area */}
-                        <div style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '30px', borderBottom: '1px solid #eee', paddingBottom: '30px' }}>
+                        <div className="pdp-action-row" style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '30px', borderBottom: '1px solid #eee', paddingBottom: '30px' }}>
                             {/* Qty */}
                             <div style={{
                                 display: 'flex',
@@ -519,9 +520,9 @@ const Product = () => {
                     </div>
                 </div>
 
-                {/* Tabs Section */}
-                <div id="details" className="pdp-tabs-container" style={{ marginBottom: '60px' }}>
-                    <div style={{ display: 'flex', gap: '5px', marginBottom: '0' }}>
+                {/* Tabs Section (Desktop) */}
+                <div id="details" className="pdp-tabs-container pdp-tabs-container-desktop" style={{ marginBottom: '60px' }}>
+                    <div className="pdp-tabs-row" style={{ display: 'flex', gap: '5px', marginBottom: '0', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                         {[
                             { name: 'Details', icon: FileText },
                             { name: 'Package Contents', icon: Package },
@@ -575,6 +576,72 @@ const Product = () => {
                             <ProductReviews sku={product.sku} />
                         )}
                     </div>
+                </div>
+
+                {/* Accordion Section (Mobile) */}
+                <div className="pdp-accordion-container pdp-accordion-container-mobile" style={{ marginBottom: '60px' }}>
+                    {[
+                        { 
+                            name: 'Details', 
+                            icon: FileText, 
+                            content: () => (
+                                <div className="pdp-details-wrapper">
+                                    <h3 style={{ marginTop: 0, textTransform: 'uppercase', fontSize: '16px', color: '#333', marginBottom: '20px' }}>Features</h3>
+                                    <div className="pdp-details-content overflow-protected" dangerouslySetInnerHTML={{ __html: decodeHtml(product.description.html) }} />
+                                </div>
+                            ) 
+                        },
+                        { 
+                            name: 'Package Contents', 
+                            icon: Package, 
+                            content: () => (
+                                product.package_contents && product.package_contents.html
+                                    ? <div className="overflow-protected" dangerouslySetInnerHTML={{ __html: decodeHtml(product.package_contents.html) }} />
+                                    : <div>Package contents not available.</div>
+                            ) 
+                        },
+                        { 
+                            name: 'Reviews', 
+                            icon: Star, 
+                            content: () => <ProductReviews sku={product.sku} /> 
+                        }
+                    ].map(section => {
+                        const isOpen = activeTab === section.name.toLowerCase();
+                        return (
+                            <div key={section.name} className="pdp-accordion-item" style={{ borderBottom: '1px solid #eee' }}>
+                                <button
+                                    onClick={() => setActiveTab(isOpen ? '' : section.name.toLowerCase())}
+                                    className="pdp-accordion-header"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        width: '100%',
+                                        padding: '20px',
+                                        background: isOpen ? '#fcfcfc' : '#fff',
+                                        border: 'none',
+                                        borderTop: '1px solid #eee',
+                                        cursor: 'pointer',
+                                        fontSize: '15px',
+                                        fontWeight: isOpen ? '700' : '600',
+                                        color: isOpen ? 'var(--primary-color)' : '#333',
+                                        textAlign: 'left'
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <section.icon size={18} />
+                                        {section.name}
+                                    </div>
+                                    {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                </button>
+                                {isOpen && (
+                                    <div className="pdp-accordion-content" style={{ padding: '0 20px 20px 20px', background: '#fcfcfc' }}>
+                                        {section.content()}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
 
                 {/* Key Features Section */}

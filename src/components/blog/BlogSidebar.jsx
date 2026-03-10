@@ -65,7 +65,7 @@ const BlogSidebar = () => {
             top: '20px'
         }}>
             {/* Search Widget */}
-            <div className="sidebar-widget" style={{
+            <div className="sidebar-widget blog-search-widget" style={{
                 background: '#fff',
                 padding: '25px',
                 borderRadius: '18px',
@@ -176,7 +176,7 @@ const BlogSidebar = () => {
             </div>
 
             {/* Recent Posts Widget */}
-            <div className="sidebar-widget" style={{
+            <div className="sidebar-widget blog-recent-widget" style={{
                 background: '#fff',
                 padding: '25px',
                 borderRadius: '18px',

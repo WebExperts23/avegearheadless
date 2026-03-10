@@ -58,7 +58,7 @@ const Home = () => {
                 {loading ? (
                     <SkeletonGrid />
                 ) : (
-                    <div className="grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+                    <div className="grid product-slider" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
                         {promoProducts.map(product => (
                             <ProductCard key={product.uid} product={product} />
                         ))}
@@ -77,7 +77,7 @@ const Home = () => {
                     {loading ? (
                         <SkeletonGrid />
                     ) : (
-                        <div className="grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+                        <div className="grid product-slider" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
                             {trendingProducts.map(product => (
                                 <ProductCard key={product.uid} product={product} />
                             ))}

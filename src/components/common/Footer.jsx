@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useMutation } from '@apollo/client';
 import { fetchAdminToken } from '../../api/client';
+import { SUBSCRIBE_NEWSLETTER } from '../../api/newsletter';
 import './Footer.css';
 
 const Footer = () => {
     const [blockContent, setBlockContent] = useState('');
     const [loading, setLoading] = useState(true);
+    const [subscribeEmailToNewsletter] = useMutation(SUBSCRIBE_NEWSLETTER);
 
     useEffect(() => {
         const fetchFooterBlock = async () => {
@@ -96,25 +99,90 @@ const Footer = () => {
         const newsletterBlockPattern = /\{\{block\s+class=(?:&quot;|")Magento\\Newsletter\\Block\\Subscribe(?:&quot;|")[^}]*\}\}/gi;
         const newsletterHtml = `
             <div class="newsletter-form">
-                <input type="email" placeholder="Enter your Email Address" />
-                <button type="button">Subscribe</button>
+                <input type="email" class="newsletter-input" placeholder="Enter your Email Address" />
+                <button type="button" class="newsletter-submit-btn">Subscribe</button>
             </div>
+            <div class="newsletter-message" style="margin-top: 10px; font-size: 0.85rem; height: 20px;"></div>
         `;
         htmlSnippet = htmlSnippet.replace(newsletterBlockPattern, newsletterHtml);
 
         return htmlSnippet;
     })();
 
+    // Handle Event Delegation for raw HTML
+    const handleFooterClick = async (e) => {
+        // Did they click the subscribe button?
+        if (e.target && e.target.classList.contains('newsletter-submit-btn')) {
+            e.preventDefault();
+            
+            const btn = e.target;
+            const container = btn.closest('.newsletter-form');
+            const input = container.querySelector('.newsletter-input');
+            const msgBox = container.nextElementSibling;
+            
+            const email = input.value.trim();
+            
+            // Simple validation
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                msgBox.textContent = 'Please enter a valid email address.';
+                msgBox.style.color = '#ff4d4d';
+                return;
+            }
+
+            // UI Loading state
+            btn.disabled = true;
+            btn.textContent = 'Subscribing...';
+            msgBox.textContent = '';
+
+            try {
+                const { data } = await subscribeEmailToNewsletter({
+                    variables: { email }
+                });
+
+                if (data?.subscribeEmailToNewsletter?.status === 'SUBSCRIBED') {
+                    msgBox.textContent = 'Thank you for subscribing!';
+                    msgBox.style.color = '#00a651'; // Success green
+                    input.value = ''; // clear input
+                    btn.textContent = 'Subscribed';
+                } else if (data?.subscribeEmailToNewsletter?.status === 'NOT_ACTIVE') {
+                    msgBox.textContent = 'Please check your email to confirm subscription.';
+                    msgBox.style.color = '#e67e22'; // Warning orange
+                    input.value = '';
+                    btn.textContent = 'Check Email';
+                } else {
+                    msgBox.textContent = 'Subscription status: ' + data?.subscribeEmailToNewsletter?.status;
+                    msgBox.style.color = '#00a651';
+                    input.value = '';
+                    btn.textContent = 'Subscribe';
+                }
+                
+                // Reset button text after a few seconds if successful
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.textContent = 'Subscribe';
+                }, 3000);
+
+            } catch (err) {
+                console.error("Newsletter subscription error:", err);
+                msgBox.textContent = err.message || 'An error occurred. Please try again.';
+                msgBox.style.color = '#ff4d4d';
+                btn.disabled = false;
+                btn.textContent = 'Subscribe';
+            }
+        }
+    };
+
     return (
-        <footer style={{ backgroundColor: '#000', color: '#fff', marginTop: '60px' }}>
+        <footer className="main-footer" style={{ backgroundColor: '#000', color: '#fff', marginTop: '60px' }}>
             {/* Global CMS Footer */}
             {decodedContent ? (
                 <div 
-                    className="cms-footer-content"
+                    className="cms-footer-content container"
                     dangerouslySetInnerHTML={{ __html: decodedContent }} 
+                    onClick={handleFooterClick}
                 />
             ) : (
-                <div style={{ textAlign: 'center', padding: '40px' }}>
+                <div className="container" style={{ textAlign: 'center', padding: '40px' }}>
                     <p>Footer content configured in Admin is missing or empty.</p>
                 </div>
             )}

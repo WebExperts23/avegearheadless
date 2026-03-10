@@ -15,6 +15,8 @@ const Header = () => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [expandedMobileCategory, setExpandedMobileCategory] = useState(null);
 
     // Lazy query for suggestions
     const [fetchSuggestions, { data: searchData, loading: searchLoading }] = useLazyQuery(GET_PRODUCTS);
@@ -65,8 +67,8 @@ const Header = () => {
 
     return (
         <header>
-            {/* Top Bar */}
-            <div className="top-bar bg-dark" style={{ padding: '8px 0', fontSize: '12px', borderBottom: '1px solid #333' }}>
+            {/* Top Bar - Desktop Only */}
+            <div className="top-bar bg-dark desktop-only-topbar" style={{ padding: '8px 0', fontSize: '12px', borderBottom: '1px solid #333' }}>
                 <div className="container flex justify-between">
                     <div className="flex gap-4">
                         <span>Free Shipping &gt; $200</span>
@@ -80,11 +82,86 @@ const Header = () => {
                 </div>
             </div>
 
+            {/* Mobile Sidebar Overlay */}
+            <div 
+                className={`mobile-overlay ${isMobileMenuOpen ? 'active' : ''}`}
+                onClick={() => setIsMobileMenuOpen(false)}
+            />
+
+            {/* Mobile Sidebar Drawer */}
+            <div className={`mobile-sidebar-root ${isMobileMenuOpen ? 'active' : ''}`}>
+                <div className="mobile-sidebar-header">
+                    <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Menu</span>
+                    <button type="button" className="close-mobile-menu" onClick={(e) => { e.stopPropagation(); setIsMobileMenuOpen(false); }}>
+                        &times;
+                    </button>
+                </div>
+                <div className="mobile-sidebar-content">
+                    <ul className="mobile-nav-menu">
+                        <li><Link to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</Link></li>
+                        
+                        {initLoading ? null : (
+                            visibleCategories.map(category => (
+                                <li key={category.uid} className={`mobile-has-children ${expandedMobileCategory === category.uid ? 'expanded' : ''}`}>
+                                    <div className="mobile-nav-link-row">
+                                        <Link to={`/${category.url_key}.html`} onClick={() => setIsMobileMenuOpen(false)}>
+                                            {category.name}
+                                        </Link>
+                                        {category.children && category.children.length > 0 && (
+                                            <button 
+                                                className="mobile-expand-btn"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    setExpandedMobileCategory(prev => prev === category.uid ? null : category.uid);
+                                                }}
+                                            >
+                                                <ChevronDown size={20} style={{ transform: expandedMobileCategory === category.uid ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                                            </button>
+                                        )}
+                                    </div>
+                                    
+                                    {category.children && category.children.length > 0 && (
+                                        <ul className="mobile-sub-menu">
+                                            {category.children.map(child => (
+                                                <li key={child.uid}>
+                                                    <Link to={`/${child.url_key}.html`} onClick={() => setIsMobileMenuOpen(false)}>{child.name}</Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </li>
+                            ))
+                        )}
+                        <li><Link to="/blog" onClick={() => setIsMobileMenuOpen(false)}>Blog</Link></li>
+                        <li><Link to="#" style={{ color: '#ff4d4d' }} onClick={() => setIsMobileMenuOpen(false)}>Deals</Link></li>
+                    </ul>
+                    
+                    <div className="mobile-nav-footer">
+                        <Link to={user ? "/account" : "/login"} onClick={() => setIsMobileMenuOpen(false)}>
+                            <User size={18} /> <span>{user ? 'My Account' : 'Sign In'}</span>
+                        </Link>
+                        <Link to="#" onClick={() => setIsMobileMenuOpen(false)}>Find a Store</Link>
+                        <Link to="#" onClick={() => setIsMobileMenuOpen(false)}>Contact Us</Link>
+                    </div>
+                </div>
+            </div>
+
             {/* Main Header */}
             <div className="main-header" style={{ padding: '20px 0', borderBottom: '1px solid #eee' }}>
-                <div className="container flex items-center justify-between">
+                <div className="container header-primary-row flex items-center justify-between">
+                    
+                    {/* Hamburger Toggle (Mobile Only) */}
+                    <button 
+                        type="button"
+                        className="mobile-menu-toggle"
+                        onClick={(e) => { e.stopPropagation(); setIsMobileMenuOpen(true); }}
+                    >
+                        <Menu size={28} />
+                    </button>
+
                     {/* Logo */}
-                    <Link to="/" className="logo" style={{ minWidth: '150px' }}>
+                    <Link to="/" className="logo header-logo">
                         {fullLogoUrl ? (
                             <OptimizedImage 
                                 src={fullLogoUrl} 
@@ -98,7 +175,7 @@ const Header = () => {
                     </Link>
 
                     {/* Search Bar */}
-                    <div className="search-bar" style={{ flex: 1, margin: '0 40px', maxWidth: '600px', position: 'relative' }} ref={containerRef}>
+                    <div className="search-bar header-search-container" ref={containerRef}>
                         <form onSubmit={(e) => {
                             e.preventDefault();
                             if (searchTerm.trim()) {
@@ -227,8 +304,8 @@ const Header = () => {
                     </div>
 
                     {/* Icons */}
-                    <div className="header-icons flex items-center" style={{ gap: '40px' }}>
-                        <Link to={user ? "/account" : "/login"} style={{ color: '#333', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }} title={user ? "My Account" : "Sign In"}>
+                    <div className="header-icons flex items-center header-icons-container">
+                        <Link to={user ? "/account" : "/login"} className="desktop-account-icon" style={{ color: '#333', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }} title={user ? "My Account" : "Sign In"}>
                             <User size={24} strokeWidth={1.5} />
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                                 <span style={{ fontSize: '10px', textTransform: 'uppercase', color: '#888', fontWeight: '700', lineHeight: 1 }}>{user ? 'Welcome' : 'Guest'}</span>
@@ -289,8 +366,8 @@ const Header = () => {
                 </div>
             </div>
 
-            {/* Navigation Menu */}
-            <div className="nav-bar bg-dark" style={{ borderTop: '1px solid #333' }}>
+            {/* Navigation Menu (Desktop Only) */}
+            <div className="nav-bar bg-dark desktop-nav-bar" style={{ borderTop: '1px solid #333' }}>
                 <div style={{ padding: '0', width: '100%' }}>
                     <nav className="main-nav">
                         <ul className="main-menu">

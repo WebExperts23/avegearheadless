@@ -20,14 +20,14 @@ const FeatureItem = ({ icon: Icon, title, desc }) => (
 
 const Features = () => {
     return (
-        <div style={{ backgroundColor: '#111', padding: '100px 0', marginTop: '60px' }}>
+        <div className="features-section" style={{ backgroundColor: '#111', padding: '100px 0', marginTop: '60px' }}>
             <div className="container">
                 <div style={{ textAlign: 'center', marginBottom: '80px', color: 'white' }}>
-                    <h2 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '15px' }}>Why AV<span style={{ color: 'var(--primary-color)' }}>Gear</span></h2>
+                    <h2 className="section-title white" style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '15px' }}>Why AV<span style={{ color: 'var(--primary-color)' }}>Gear</span></h2>
                     <p style={{ color: '#aaa', fontSize: '1.1rem' }}>Your trusted partner in premium audio</p>
                 </div>
 
-                <div className="grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+                <div className="grid features-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
                     <FeatureItem icon={ShieldCheck} title="Genuine Brands" desc="100% Authentic Products" />
                     <FeatureItem icon={Clock} title="40 Years Experience" desc="Trusted by audiophiles" />
                     <FeatureItem icon={CheckCircle} title="Best Support" desc="Expert advice anytime" />

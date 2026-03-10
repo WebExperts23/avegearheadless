@@ -10,6 +10,8 @@ import { AuthProvider } from './contexts/AuthContext'
 import { WishlistProvider } from './contexts/WishlistContext'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import './styles/main.css'
+import './styles/mobile.css'
+import './styles/tablet.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

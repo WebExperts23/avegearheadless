@@ -230,13 +230,14 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
 
                 <button
                     onClick={() => addToCart(product)}
-                    className="primary"
+                    className="primary add-to-cart-btn"
                     style={{
                         width: isList ? 'auto' : '100%',
                         alignSelf: isList ? 'flex-start' : 'stretch',
                         marginTop: 'auto',
                         padding: isList ? '12px 30px' : '10px 20px',
-                        borderRadius: '30px'
+                        borderRadius: '30px',
+                        minHeight: '44px'
                     }}
                     disabled={isOutOfStock || isAtLimit || isProcessing}
                 >

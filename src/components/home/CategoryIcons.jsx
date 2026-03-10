@@ -11,7 +11,7 @@ const CategoryIcons = () => {
 
     return (
         <div className="container" style={{ position: 'relative', zIndex: 10 }}>
-            <div style={{
+            <div className="category-icons-grid" style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(4, 1fr)',
                 gap: '20px',

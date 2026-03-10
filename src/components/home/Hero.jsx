@@ -16,10 +16,9 @@ const Hero = () => {
     const products = data?.products?.items || [];
 
     return (
-        <div style={{
+        <div className="hero-section" style={{
             position: 'relative',
             minHeight: '700px',
-            backgroundColor: 'transparent',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -28,7 +27,7 @@ const Hero = () => {
             paddingBottom: '120px'
         }}>
             {/* Background Image */}
-            <div style={{
+            <div className="hero-bg" style={{
                 position: 'absolute',
                 top: 0,
                 left: 0,
@@ -40,8 +39,8 @@ const Hero = () => {
                 zIndex: 0
             }} role="img" aria-label="Hero Background"></div>
 
-            <div className="container" style={{ position: 'relative', zIndex: 2, textAlign: 'center', width: '100%', paddingTop: '100px' }}>
-                <h1 style={{
+            <div className="container hero-container" style={{ position: 'relative', zIndex: 2, textAlign: 'center', width: '100%', paddingTop: '100px' }}>
+                <h1 className="hero-title" style={{
                     fontSize: '3.5rem',
                     fontWeight: '300',
                     color: '#333',
@@ -53,7 +52,7 @@ const Hero = () => {
                 </h1>
 
                 {/* Product Promo Grid embedded in Hero */}
-                <div style={{
+                <div className="hero-promo-grid product-slider" style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(4, 1fr)',
                     gap: '20px',
@@ -67,7 +66,7 @@ const Hero = () => {
                             ))}
                         </>
                     ) : products.map((product) => (
-                        <div key={product.uid} style={{
+                        <div key={product.uid} className="hero-product-card" style={{
                             background: 'rgba(255, 255, 255, 0.9)',
                             padding: '30px 20px',
                             borderRadius: '12px',

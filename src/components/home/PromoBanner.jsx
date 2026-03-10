@@ -3,7 +3,7 @@ import React from 'react';
 const PromoBanner = () => {
     return (
         <div className="container" style={{ margin: '80px auto' }}>
-            <div style={{
+            <div className="promo-banner" style={{
                 position: 'relative',
                 borderRadius: '16px',
                 overflow: 'hidden',

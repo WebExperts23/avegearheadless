@@ -28,8 +28,8 @@ const PostDetail = () => {
 
     if (loading) return (
         <div className="container" style={{ padding: '100px 0' }}>
-            <div className="flex gap-10">
-                <div style={{ flex: 1 }}>
+            <div className="blog-layout">
+                <div className="blog-main-content">
                     <div className="skeleton" style={{ width: '100%', height: '400px', borderRadius: '18px', marginBottom: '40px' }}></div>
                     <div className="skeleton" style={{ width: '60%', height: '2rem', marginBottom: '20px' }}></div>
                     <div className="skeleton" style={{ width: '100%', height: '1rem', marginBottom: '10px' }}></div>
@@ -75,35 +75,28 @@ const PostDetail = () => {
                 />
             )}
             {/* Header / Featured Image */}
-            <div style={{ position: 'relative', height: '500px', background: '#333', overflow: 'hidden', marginBottom: '60px' }}>
+            <div className="post-detail-hero">
                 {post.featured_image && (
                     <img
                         src={post.featured_image}
                         alt={post.title}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }}
+                        className="post-detail-hero-img"
                     />
                 )}
-                <div style={{
-                    position: 'absolute',
-                    bottom: '60px',
-                    left: 0,
-                    right: 0,
-                    color: '#fff',
-                    textAlign: 'center'
-                }}>
+                <div className="post-detail-hero-content">
                     <div className="container">
-                        <div style={{ fontSize: '0.9rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '15px', color: 'var(--primary-color)' }}>
+                        <div className="post-detail-hero-meta">
                             {post.author?.name || 'Admin'} • {new Date(post.publish_time).toLocaleDateString()}
                         </div>
-                        <h1 style={{ fontSize: '3rem', margin: 0, lineHeight: 1.2 }}>{post.title}</h1>
+                        <h1 className="post-detail-hero-title">{post.title}</h1>
                     </div>
                 </div>
             </div>
 
             <div className="container">
-                <div className="flex gap-10" style={{ display: 'flex', gap: '60px', alignItems: 'flex-start', marginBottom: '100px' }}>
+                <div className="blog-layout" style={{ marginBottom: '100px' }}>
                     {/* Main Content */}
-                    <div style={{ flex: 1, maxWidth: '800px' }}>
+                    <div className="blog-main-content">
                         <Link to="/blog" style={{ display: 'inline-block', marginBottom: '30px', color: '#666', fontSize: '0.9rem' }}>
                             ← Back to all stories
                         </Link>
@@ -134,7 +127,7 @@ const PostDetail = () => {
                     </div>
 
                     {/* Sidebar */}
-                    <div style={{ width: '350px', flexShrink: 0 }}>
+                    <div className="blog-sidebar-wrapper">
                         <BlogSidebar />
                     </div>
                 </div>

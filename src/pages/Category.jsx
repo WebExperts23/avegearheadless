@@ -17,6 +17,7 @@ const Category = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [sort, setSort] = useState({});
     const [pageSize, setPageSize] = useState(12);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const toggleGroup = (groupId) => {
         setExpandedGroupId(prev => prev === groupId ? null : groupId);
@@ -131,7 +132,7 @@ const Category = () => {
                 </div>
             </div>
             <div className="container">
-                <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '40px' }}>
+                <div className="category-layout">
                     <aside className="filters-sidebar">
                         <div className="skeleton" style={{ width: '100%', height: '30px', marginBottom: '20px' }}></div>
                         {[1, 2, 3].map(i => (
@@ -182,11 +183,21 @@ const Category = () => {
             </div>
 
             <div className="container">
-                <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '40px' }}>
+                {/* Mobile Filter Toggle */}
+                <div className="mobile-filter-toggle">
+                    <button onClick={() => setIsFilterOpen(true)} className="btn primary" style={{ width: '100%', marginBottom: '20px' }}>
+                        Filter & Sort
+                    </button>
+                </div>
+
+                <div className="category-layout">
 
                     {/* Sidebar Filters */}
-                    <aside className="filters-sidebar">
-                        <h2 className="sidebar-shop-by">Shop By</h2>
+                    <aside className={`filters-sidebar ${isFilterOpen ? 'open' : ''}`}>
+                        <div className="filter-header-mobile">
+                            <h2 className="sidebar-shop-by">Shop By</h2>
+                            <button className="close-filter-btn" onClick={() => setIsFilterOpen(false)}>&times;</button>
+                        </div>
 
                         {/* Category Block (Always shown as active in SS) */}
                         <div className={`filter-block ${expandedGroupId === 'category' ? 'active' : ''}`}>
@@ -257,15 +268,8 @@ const Category = () => {
                             </div>
                         ) : (
                             <>
-                                <div style={{
-                                    marginBottom: '25px',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    borderBottom: '1px solid #eee',
-                                    paddingBottom: '15px'
-                                }}>
-                                    <div style={{ fontSize: '0.9rem', color: '#666', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '20px' }}>
+                                <div className="category-controls">
+                                    <div className="category-counts-sort">
                                         <span>{totalCount} products found</span>
 
                                         <select
@@ -313,7 +317,7 @@ const Category = () => {
                                             <option value="36">Show: 36</option>
                                         </select>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                    <div className="category-view-toggles">
                                         <button
                                             onClick={() => setViewMode('grid')}
                                             style={{

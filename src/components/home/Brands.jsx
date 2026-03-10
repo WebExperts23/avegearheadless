@@ -5,9 +5,9 @@ const Brands = () => {
     const brands = ['Pioneer', 'DENON', 'Marantz', 'KENWOOD', 'Marshall', 'Klipsch', 'ALPINE'];
 
     return (
-        <div className="container" style={{ textAlign: 'center', margin: '80px auto' }}>
-            <h3 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '50px', color: '#222' }}>Trusted Brands We Carry</h3>
-            <div style={{
+        <div className="container brands-section" style={{ textAlign: 'center', margin: '80px auto' }}>
+            <h3 className="section-title" style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '50px', color: '#222' }}>Trusted Brands We Carry</h3>
+            <div className="brands-grid" style={{
                 display: 'flex',
                 justifyContent: 'center',
                 flexWrap: 'wrap',

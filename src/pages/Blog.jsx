@@ -34,15 +34,15 @@ const Blog = () => {
                 </div>
             </div>
             <div className="container" style={{ padding: '60px 0' }}>
-                <div style={{ display: 'flex', gap: '40px' }}>
-                    <div style={{ flex: 1 }}>
-                        <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '30px' }}>
+                <div className="blog-layout">
+                    <div className="blog-main-content">
+                        <div className="grid blog-posts-grid">
                             {[1, 2, 3, 4].map(i => (
                                 <div key={i} className="skeleton" style={{ height: '400px', borderRadius: '18px' }}></div>
                             ))}
                         </div>
                     </div>
-                    <div style={{ width: '350px' }} className="skeleton"></div>
+                    <div className="skeleton blog-sidebar-wrapper"></div>
                 </div>
             </div>
         </div>
@@ -70,11 +70,11 @@ const Blog = () => {
             </div>
 
             <div className="container">
-                <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
+                <div className="blog-layout">
                     {/* Main Content */}
-                    <div style={{ flex: 1 }}>
+                    <div className="blog-main-content">
                         {posts.length > 0 ? (
-                            <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '40px', marginBottom: '80px' }}>
+                            <div className="grid blog-posts-grid" style={{ marginBottom: '80px' }}>
                                 {posts.map(post => (
                                     <article key={post.post_id} className="blog-card" style={{
                                         background: '#fff',
@@ -156,7 +156,7 @@ const Blog = () => {
                     </div>
 
                     {/* Sidebar */}
-                    <div style={{ width: '350px', flexShrink: 0 }}>
+                    <div className="blog-sidebar-wrapper">
                         <BlogSidebar />
                     </div>
                 </div>
