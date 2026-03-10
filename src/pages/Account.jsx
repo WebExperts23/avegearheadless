@@ -42,8 +42,8 @@ const Account = () => {
     ];
 
     return (
-        <div className="container" style={{ padding: '60px 0' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '50px' }}>
+        <div className="container account-page" style={{ padding: '60px 0' }}>
+            <div className="account-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '50px' }}>
                 <div>
                     <h1 style={{ fontSize: '2.5rem', fontWeight: '800', margin: '0 0 10px' }}>
                         Hello, <span style={{ color: 'var(--primary-color)' }}>{user.firstname}!</span>
@@ -82,7 +82,7 @@ const Account = () => {
             </div>
 
             {/* Quick Stats */}
-            <div className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '30px', marginBottom: '50px' }}>
+            <div className="account-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '30px', marginBottom: '50px' }}>
                 {stats.map((stat, i) => (
                     <div key={i} style={{
                         background: '#fff',
@@ -114,7 +114,7 @@ const Account = () => {
                 ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '40px' }}>
+            <div className="account-main-layout" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '40px' }}>
                 {/* Orders Section */}
                 <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
@@ -128,7 +128,7 @@ const Account = () => {
                         {user.orders?.items?.length > 0 ? (
                             <div>
                                 {user.orders.items.map((order, i) => (
-                                    <div key={order.id} style={{
+                                    <div key={order.id} className="account-order-item" style={{
                                         padding: '25px',
                                         borderBottom: i === user.orders.items.length - 1 ? 'none' : '1px solid #f5f5f5',
                                         display: 'flex',
@@ -139,7 +139,7 @@ const Account = () => {
                                             <div style={{ fontWeight: '700', fontSize: '1.1rem', marginBottom: '5px' }}>Order #{order.number}</div>
                                             <div style={{ fontSize: '0.9rem', color: '#888' }}>Placed on {new Date(order.order_date).toLocaleDateString()}</div>
                                         </div>
-                                        <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '40px' }}>
+                                        <div className="account-order-details" style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '40px' }}>
                                             <div>
                                                 <div style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase', marginBottom: '2px' }}>Total</div>
                                                 <div style={{ fontWeight: '800' }}>{order.total.grand_total.currency} {order.total.grand_total.value.toFixed(2)}</div>

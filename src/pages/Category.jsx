@@ -120,8 +120,10 @@ const Category = () => {
     };
 
     const handlePageChange = (page) => {
-        setCurrentPage(page);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
 
     if (loading) return (
@@ -279,6 +281,7 @@ const Category = () => {
                                                 if (val === 'price_asc') setSort({ price: 'ASC' });
                                                 else if (val === 'price_desc') setSort({ price: 'DESC' });
                                                 else setSort({});
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
                                             }}
                                             style={{
                                                 padding: '6px 12px',
@@ -301,6 +304,7 @@ const Category = () => {
                                             onChange={(e) => {
                                                 setPageSize(parseInt(e.target.value));
                                                 setCurrentPage(1);
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
                                             }}
                                             style={{
                                                 padding: '6px 12px',

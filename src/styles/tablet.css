@@ -57,8 +57,8 @@
         top: 0;
         left: -320px;
         width: 300px;
-        height: 100vh;
-        background: #fff;
+        height: 100dvh; /* Fix for iOS safari bottom bar */
+        background: #1a1a1a; /* Dark theme */
         z-index: 10001;
         box-shadow: 2px 0 15px rgba(0,0,0,0.1);
         transition: left 0.3s ease;
@@ -73,11 +73,12 @@
 
     .mobile-sidebar-header {
         padding: 20px;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid #333;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: #f8f8f8;
+        background: #111;
+        color: #fff;
     }
 
     .close-mobile-menu {
@@ -86,13 +87,18 @@
         font-size: 28px;
         line-height: 1;
         cursor: pointer;
-        color: #333;
+        color: #fff;
+        transition: color 0.2s;
+    }
+    .close-mobile-menu:hover {
+        color: var(--primary-color);
     }
 
     .mobile-sidebar-content {
         flex: 1;
         overflow-y: auto;
-        padding: 0;
+        overscroll-behavior: contain;
+        padding-bottom: 40px;
     }
 
     .mobile-nav-menu {
@@ -102,16 +108,22 @@
     }
 
     .mobile-nav-menu > li {
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid #333;
     }
 
     .mobile-nav-menu a {
         display: block;
         padding: 15px 20px;
-        color: #333;
+        color: #e0e0e0;
         text-decoration: none;
         font-weight: 500;
         font-size: 15px;
+        transition: color 0.2s, background 0.2s;
+    }
+
+    .mobile-nav-menu a:hover, .mobile-nav-menu a:active {
+        color: #fff;
+        background: rgba(255,255,255,0.05);
     }
 
     .mobile-nav-link-row {
@@ -132,7 +144,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        border-left: 1px solid #eee;
+        border-left: 1px solid #333;
+        color: #e0e0e0;
     }
 
     .mobile-sub-menu {
@@ -140,8 +153,8 @@
         list-style: none;
         padding: 0;
         margin: 0;
-        background: #f9f9f9;
-        border-top: 1px solid #eee;
+        background: #111;
+        border-top: 1px solid #333;
     }
 
     .mobile-has-children.expanded .mobile-sub-menu {
@@ -151,13 +164,18 @@
     .mobile-sub-menu a {
         padding: 12px 20px 12px 40px;
         font-size: 14px;
-        color: #555;
+        color: #bbb;
+    }
+
+    .mobile-sub-menu a:hover, .mobile-sub-menu a:active {
+        color: var(--primary-color);
+        background: rgba(255,255,255,0.02);
     }
 
     .mobile-nav-footer {
         padding: 20px;
-        background: #f8f8f8;
-        border-top: 1px solid #eee;
+        background: #111;
+        border-top: 1px solid #333;
         display: flex;
         flex-direction: column;
         gap: 15px;
@@ -167,10 +185,15 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        color: #333;
+        color: #e0e0e0;
         text-decoration: none;
         font-weight: 500;
         font-size: 15px;
+        transition: color 0.2s;
+    }
+    
+    .mobile-nav-footer a:hover {
+        color: var(--primary-color);
     }
 
     /* Blog Page Adjustments */
@@ -185,6 +208,44 @@
 
     .blog-posts-grid {
         grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* Cart Page (Tablet) */
+    .cart-main-layout {
+        grid-template-columns: 1fr !important; /* Move summary block below items */
+        gap: 30px !important;
+    }
+
+    .cart-summary-card {
+        position: static !important; /* Turn off sticky behavior */
+    }
+
+    .cart-item-row {
+        gap: 15px !important;
+        padding: 20px !important;
+    }
+
+    .cart-item-title {
+        font-size: 1.1rem !important;
+    }
+
+    /* Account Page (Tablet) */
+    .account-page {
+        padding: 40px 20px !important;
+    }
+
+    .account-stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important; /* Stack 2 per row */
+        gap: 20px !important;
+    }
+
+    .account-main-layout {
+        grid-template-columns: 1fr !important; /* Move side column below orders */
+        gap: 30px !important;
+    }
+
+    .account-order-item {
+        padding: 20px !important;
     }
 
     /* Product Detail Page (Tablet) */

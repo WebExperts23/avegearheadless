@@ -145,11 +145,11 @@ const Cart = () => {
                     <p style={{ color: '#666' }}>You have {cartItems.length} items in your cart</p>
                 </div>
 
-                <div className="cart-content" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '40px', alignItems: 'start' }}>
+                <div className="cart-main-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '40px', alignItems: 'start' }}>
                     {/* Items List */}
                     <div className="cart-items" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         {cartItems.map(item => (
-                            <div key={item.id} className="checkout-card" style={{ display: 'flex', gap: '24px', alignItems: 'center', padding: '24px' }}>
+                            <div key={item.id} className="checkout-card cart-item-row" style={{ display: 'flex', gap: '24px', alignItems: 'center', padding: '24px' }}>
                                 {/* Product Image */}
                                 <div style={{ width: '120px', height: '120px', background: '#f5f5f5', borderRadius: '12px', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     {(item.product.thumbnail?.url || item.product.small_image?.url || item.product.media_gallery?.[0]?.url) ? (
@@ -164,13 +164,13 @@ const Cart = () => {
                                 </div>
 
                                 {/* Product Info */}
-                                <div style={{ flex: 1 }}>
+                                <div className="cart-item-details" style={{ flex: 1 }}>
                                     <div style={{ fontSize: '12px', textTransform: 'uppercase', color: 'var(--primary-color)', fontWeight: '700', letterSpacing: '1px', marginBottom: '4px' }}>
                                         {item.product.sku}
                                     </div>
-                                    <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '8px', color: '#1a1a1a' }}>{item.product.name}</h3>
+                                    <h3 className="cart-item-title" style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '8px', color: '#1a1a1a' }}>{item.product.name}</h3>
 
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginTop: '16px' }}>
+                                    <div className="cart-item-actions" style={{ display: 'flex', alignItems: 'center', gap: '24px', marginTop: '16px' }}>
                                         {/* Quantity Selector */}
                                         <div style={{ display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '30px', padding: '4px' }}>
                                             <button
@@ -199,7 +199,7 @@ const Cart = () => {
                                 </div>
 
                                 {/* Price */}
-                                <div style={{ textAlign: 'right', minWidth: '100px' }}>
+                                <div className="cart-item-price" style={{ textAlign: 'right', minWidth: '100px' }}>
                                     {(() => {
                                         const regularPrice = item.product.price_range.minimum_price.regular_price.value;
                                         const finalPriceNode = item.product.price_range.minimum_price.final_price;
@@ -229,7 +229,7 @@ const Cart = () => {
 
                     {/* Summary Sidebar */}
                     <div className="cart-summary-sidebar">
-                        <div className="checkout-card" style={{ padding: '32px', position: 'sticky', top: '20px' }}>
+                        <div className="checkout-card cart-summary-card" style={{ padding: '32px', position: 'sticky', top: '20px' }}>
                             <h2 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid #f0f0f0' }}>Summary</h2>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

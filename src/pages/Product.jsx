@@ -610,7 +610,10 @@ const Product = () => {
                         return (
                             <div key={section.name} className="pdp-accordion-item" style={{ borderBottom: '1px solid #eee' }}>
                                 <button
-                                    onClick={() => setActiveTab(isOpen ? '' : section.name.toLowerCase())}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setActiveTab(isOpen ? '' : section.name.toLowerCase());
+                                    }}
                                     className="pdp-accordion-header"
                                     style={{
                                         display: 'flex',
