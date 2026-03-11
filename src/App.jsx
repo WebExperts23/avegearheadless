@@ -46,7 +46,7 @@ function App() {
               <Route path="/:url_key.html" element={<Category />} />
               <Route path="/product/:sku" element={<Product />} />
               <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
+              {/* <Route path="/checkout" element={<Checkout />} /> */}
               <Route path="/search" element={<Search />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:id" element={<PostDetail />} />

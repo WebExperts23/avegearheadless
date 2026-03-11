@@ -302,8 +302,8 @@ const Cart = () => {
                                 )}
                             </div>
 
-                            <Link
-                                to="/checkout"
+                            <a
+                                href="/checkout"
                                 className="button primary"
                                 style={{
                                     display: 'flex',
@@ -320,7 +320,7 @@ const Cart = () => {
                                 }}
                             >
                                 Checkout Now <ArrowRight size={20} />
-                            </Link>
+                            </a>
 
                             <div style={{ marginTop: '24px', display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', background: '#f0fff4', borderRadius: '12px', color: '#00a651', fontSize: '13px' }}>
                                 <ShieldCheck size={20} />

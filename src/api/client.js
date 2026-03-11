@@ -3,6 +3,7 @@ import { setContext } from '@apollo/client/link/context';
 
 const httpLink = createHttpLink({
   uri: import.meta.env.VITE_MAGENTO_URL || '/graphql',
+  credentials: 'same-origin', // Ensure cookies (like PHPSESSID) are sent to the proxied backend
 });
 
 const authLink = setContext((_, { headers }) => {

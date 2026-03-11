@@ -1,6 +1,26 @@
 {
     "rewrites": [
         {
+            "source": "/checkout",
+            "destination": "https://2fc1869dd5.nxcli.io/checkout"
+        },
+        {
+            "source": "/static/(.*)",
+            "destination": "https://2fc1869dd5.nxcli.io/static/$1"
+        },
+        {
+            "source": "/media/(.*)",
+            "destination": "https://2fc1869dd5.nxcli.io/media/$1"
+        },
+        {
+            "source": "/customer/(.*)",
+            "destination": "https://2fc1869dd5.nxcli.io/customer/$1"
+        },
+        {
+            "source": "/rest/(.*)",
+            "destination": "https://2fc1869dd5.nxcli.io/rest/$1"
+        },
+        {
             "source": "/magento-api/(.*)",
             "destination": "https://2fc1869dd5.nxcli.io/$1"
         },
@@ -9,7 +29,7 @@
             "destination": "https://2fc1869dd5.nxcli.io/graphql"
         },
         {
-            "source": "/(.*)",
+            "source": "/((?!checkout|static|media|customer|rest|magento-api|graphql).*)",
             "destination": "/index.html"
         }
     ],

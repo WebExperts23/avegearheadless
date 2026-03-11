@@ -15,6 +15,31 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
         },
+        '/checkout': {
+          target: target,
+          changeOrigin: true,
+          secure: false,
+        },
+        '/static': {
+          target: target,
+          changeOrigin: true,
+          secure: false,
+        },
+        '/media': {
+          target: target,
+          changeOrigin: true,
+          secure: false,
+        },
+        '/customer': {
+          target: target,
+          changeOrigin: true,
+          secure: false,
+        },
+        '/rest': {
+          target: target,
+          changeOrigin: true,
+          secure: false,
+        },
         // Proxy for Magento REST API so frontend can call REST endpoints without CORS issues.
         '/magento-api': {
           target: target,

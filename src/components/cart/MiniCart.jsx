@@ -124,14 +124,14 @@ const MiniCart = () => {
                     >
                         View Cart
                     </Link>
-                    <Link
-                        to="/checkout"
+                    <a
+                        href="/checkout"
                         onClick={() => setIsCartOpen(false)}
                         className="button primary"
                         style={{ display: 'block', textAlign: 'center', width: '100%', padding: '12px', borderRadius: '4px', textDecoration: 'none' }}
                     >
                         Proceed to Checkout
-                    </Link>
+                    </a>
                 </div>
             </div>
             <style>{`
