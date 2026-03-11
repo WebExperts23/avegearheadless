@@ -2,8 +2,9 @@ import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
 const httpLink = createHttpLink({
-  uri: import.meta.env.VITE_MAGENTO_URL || '/graphql',
-  credentials: 'same-origin', // Ensure cookies (like PHPSESSID) are sent to the proxied backend
+  // Hardcode relative path to ensure we ALWAYS use the same domain (Vercel) as the checkout
+  uri: '/graphql',
+  credentials: 'same-origin', 
 });
 
 const authLink = setContext((_, { headers }) => {

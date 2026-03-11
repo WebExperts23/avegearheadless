@@ -33,7 +33,7 @@ const Hero = () => {
                 left: 0,
                 width: '100%',
                 height: '100%',
-                backgroundImage: 'url("https://2fc1869dd5.nxcli.io/media/wysiwyg/Container.png")',
+                backgroundImage: 'url("/media/wysiwyg/Container.png")',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center top',
                 zIndex: 0
