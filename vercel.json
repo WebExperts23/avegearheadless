@@ -17,10 +17,6 @@
             "destination": "https://2fc1869dd5.nxcli.io/customer/$1"
         },
         {
-            "source": "/customer/(.*)",
-            "destination": "https://2fc1869dd5.nxcli.io/customer/$1"
-        },
-        {
             "source": "/catalog/(.*)",
             "destination": "https://2fc1869dd5.nxcli.io/catalog/$1"
         },
