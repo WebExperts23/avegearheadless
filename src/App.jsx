@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import MiniCart from './components/cart/MiniCart';
@@ -27,6 +28,20 @@ import { AuthProvider } from './contexts/AuthContext';
 import Breadcrumbs from './components/common/Breadcrumbs';
 
 function App() {
+  useEffect(() => {
+    // Session Warm-up: Establish PHPSESSID on the headless domain
+    // This connects our GraphQL cart to the Magento PHP session
+    const warmUpSession = async () => {
+      try {
+        await fetch('/customer/section/load?sections=cart', { credentials: 'same-origin' });
+        console.log('[Session] Bridged session to Magento successfully.');
+      } catch (err) {
+        console.warn('[Session] Warm-up failed, this might happen on local dev if proxy is off:', err.message);
+      }
+    };
+    warmUpSession();
+  }, []);
+
   return (
     <BreadcrumbProvider>
       <div className="app">
