@@ -29,7 +29,7 @@
             "destination": "https://2fc1869dd5.nxcli.io/graphql"
         },
         {
-            "source": "/((?!checkout|static|media|customer|rest|magento-api|graphql|assets).*)",
+            "source": "/((?!checkout|static|media|customer|catalog|rest|magento-api|graphql|assets).*)",
             "destination": "/index.html"
         }
     ],
