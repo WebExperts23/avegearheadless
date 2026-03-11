@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
         },
-        '/checkout': {
+        '^/checkout': {
           target: target,
           changeOrigin: true,
           secure: false,

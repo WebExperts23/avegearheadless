@@ -1,8 +1,8 @@
 {
     "rewrites": [
         {
-            "source": "/checkout",
-            "destination": "https://2fc1869dd5.nxcli.io/checkout"
+            "source": "/checkout(.*)",
+            "destination": "https://2fc1869dd5.nxcli.io/checkout$1"
         },
         {
             "source": "/static/(.*)",
