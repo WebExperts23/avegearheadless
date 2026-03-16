@@ -8,6 +8,7 @@ import { getSalableQty } from '../api/stock';
 import Brands from '../components/home/Brands';
 import { useBreadcrumbs } from '../contexts/BreadcrumbContext';
 import ProductReviews from '../components/catalog/ProductReviews';
+import { useRef } from 'react';
 
 import SEO from '../components/common/SEO';
 import {
@@ -16,7 +17,7 @@ import {
     Facebook, Twitter, Instagram,
     Bluetooth, Volume2, Monitor, Headphones,
     Minus, Plus, FileText, Package, Star, Check,
-    ChevronDown, ChevronUp
+    ChevronDown, ChevronUp, ChevronLeft, ChevronRight
 } from 'lucide-react';
 
 const Product = () => {
@@ -71,6 +72,17 @@ const Product = () => {
     const [activeTab, setActiveTab] = useState('details');
     const [selectedImage, setSelectedImage] = useState(null);
     const [selectedOptions, setSelectedOptions] = useState({});
+    const thumbnailRef = useRef(null);
+
+    const scrollThumbnails = (direction) => {
+        if (thumbnailRef.current) {
+            const scrollAmount = 300;
+            thumbnailRef.current.scrollBy({
+                left: direction === 'right' ? scrollAmount : -scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
 
     // 2. Data Processing
 
@@ -308,24 +320,34 @@ const Product = () => {
                         }}>
                             <img src={mainImage} alt={product.name} style={{ maxWidth: '100%', maxHeight: '500px', objectFit: 'contain' }} />
                         </div>
-                        <div className="pdp-thumbnail-track" style={{ display: 'flex', gap: '15px', overflowX: 'auto' }}>
-                            {images.map((img, idx) => (
-                                <div
-                                    key={idx}
-                                    onClick={() => setSelectedImage(img.url)}
-                                    style={{
-                                        width: '80px',
-                                        height: '80px',
-                                        border: `1px solid ${mainImage === img.url ? 'var(--primary-color)' : '#eee'}`,
-                                        borderRadius: '8px',
-                                        cursor: 'pointer',
-                                        padding: '5px',
-                                        opacity: mainImage === img.url ? 1 : 0.7
-                                    }}
-                                >
-                                    <img src={img.url} alt={img.label} style={{ width: '100%', height: '100%', objectFit: 'contain' }} loading="lazy" />
-                                </div>
-                            ))}
+                        <div className="pdp-thumbnail-container">
+                            <button 
+                                className="pdp-nav-arrow prev" 
+                                onClick={() => scrollThumbnails('left')}
+                                aria-label="Previous thumbnails"
+                            >
+                                <ChevronLeft size={20} />
+                            </button>
+                            
+                            <div className="pdp-thumbnail-track" ref={thumbnailRef}>
+                                {images.map((img, idx) => (
+                                    <div
+                                        key={idx}
+                                        onClick={() => setSelectedImage(img.url)}
+                                        className={`thumbnail-item ${mainImage === img.url ? 'active' : ''}`}
+                                    >
+                                        <img src={img.url} alt={img.label} style={{ width: '100%', height: '100%', objectFit: 'contain' }} loading="lazy" />
+                                    </div>
+                                ))}
+                            </div>
+
+                            <button 
+                                className="pdp-nav-arrow next" 
+                                onClick={() => scrollThumbnails('right')}
+                                aria-label="Next thumbnails"
+                            >
+                                <ChevronRight size={20} />
+                            </button>
                         </div>
                     </div>
 

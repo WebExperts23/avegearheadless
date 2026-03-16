@@ -520,6 +520,12 @@ button.primary:hover {
   transition: all 0.2s;
 }
 
+.filter-block-title span {
+    font-size: 25px;
+    line-height: 1px;
+    font-weight: 500;
+}
+
 .filter-block-title:hover {
   background: #f0f0f0;
 }
@@ -595,7 +601,8 @@ button.primary:hover {
   list-style: none;
 }
 
-.pdp-details-content li {
+
+ .pdp-details-content li {
   position: relative;
   padding-left: 30px;
   margin-bottom: 12px;
@@ -822,5 +829,97 @@ button.primary:hover {
 
 .filter-header-mobile {
   display: none;
+}
+
+/* --- PRODUCT GALLERY FIX (STRICT OVERRIDE) --- */
+.pdp-gallery-section .pdp-thumbnail-track {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  gap: 15px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-top: 25px !important;
+  padding: 5px 2px 5px 2px !important; /* Reduced padding-bottom since scrollbar is hidden */
+  scrollbar-width: none !important; /* Hide scrollbar Firefox */
+  -ms-overflow-style: none !important;  /* Hide scrollbar IE/Edge */
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.pdp-gallery-section .pdp-thumbnail-track::-webkit-scrollbar {
+  display: none !important; /* Hide scrollbar Chrome/Safari */
+}
+
+.pdp-thumbnail-container {
+  position: relative;
+  width: 100%;
+}
+
+.pdp-nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+  color: #333;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.pdp-nav-arrow:hover {
+  background: #fff;
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.pdp-nav-arrow.prev {
+  left: -16px;
+}
+
+.pdp-nav-arrow.next {
+  right: -16px;
+}
+
+@media (max-width: 767px) {
+  .pdp-nav-arrow {
+    display: none !important; /* Hide arrows on mobile, keep native swipe */
+  }
+  .pdp-gallery-section .pdp-thumbnail-track {
+    scrollbar-width: auto !important; /* Show scrollbar on mobile if helpful */
+  }
+}
+
+.pdp-gallery-section .thumbnail-item {
+  flex: 0 0 110px !important; /* Increased size from 80px to 110px */
+  width: 110px !important;
+  height: 110px !important;
+  border: 1px solid #eee !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  background: #fff !important;
+  padding: 5px !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+}
+
+.pdp-gallery-section .thumbnail-item.active {
+  border-color: var(--primary-color) !important;
+  border-width: 2px !important;
+}
+
+.pdp-gallery-section .thumbnail-item:hover {
+  border-color: var(--primary-color) !important;
 }
 
