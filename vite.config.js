@@ -14,41 +14,68 @@ export default defineConfig(({ mode }) => {
           target: target,
           changeOrigin: true,
           secure: false,
+          cookieDomainRewrite: "localhost",
+          xfwd: true
         },
         '^/checkout': {
           target: target,
           changeOrigin: true,
           secure: false,
+          cookieDomainRewrite: "localhost",
+          xfwd: true,
+          autoRewrite: true,
+          configure: (proxy) => {
+            proxy.on('proxyRes', (proxyRes, req, res) => {
+              const location = proxyRes.headers['location'];
+              if (location && location.includes(target)) {
+                console.log(`[Proxy] Rewriting absolute redirect from ${location} to relative`);
+                proxyRes.headers['location'] = location.replace(target, '');
+              }
+              const cookies = proxyRes.headers['set-cookie'];
+              if (cookies) {
+                console.log(`[Proxy] Set-Cookie from ${req.url}:`, cookies);
+              }
+            });
+          }
         },
         '/static': {
           target: target,
           changeOrigin: true,
           secure: false,
+          xfwd: true
         },
         '/media': {
           target: target,
           changeOrigin: true,
           secure: false,
+          xfwd: true
         },
         '/customer': {
           target: target,
           changeOrigin: true,
           secure: false,
+          cookieDomainRewrite: "localhost",
+          xfwd: true
         },
-        '/customer': {
+        '/customer/section/load': {
           target: target,
           changeOrigin: true,
           secure: false,
+          cookieDomainRewrite: "localhost",
+          xfwd: true
         },
         '/catalog': {
           target: target,
           changeOrigin: true,
           secure: false,
+          xfwd: true
         },
         '/rest': {
           target: target,
           changeOrigin: true,
           secure: false,
+          cookieDomainRewrite: "localhost",
+          xfwd: true
         },
         // Proxy for Magento REST API so frontend can call REST endpoints without CORS issues.
         '/magento-api': {
@@ -56,8 +83,15 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/magento-api/, ''),
-          configure: (proxy, options) => {
-            // We no longer forcefully append a static access token because we grab dynamic admin session tokens in client.js
+          cookieDomainRewrite: "localhost",
+          xfwd: true,
+          configure: (proxy) => {
+            proxy.on('proxyRes', (proxyRes, req, res) => {
+              const cookies = proxyRes.headers['set-cookie'];
+              if (cookies) {
+                console.log(`[Proxy] Set-Cookie from ${req.url}:`, cookies);
+              }
+            });
           }
         }
       }

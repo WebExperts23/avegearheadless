@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCart } from '../contexts/CartContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
     Trash2,
     ShoppingBag,
@@ -50,48 +50,27 @@ const REMOVE_COUPON = gql`
   }
 `;
 
-const GET_CART_TOTALS = gql`
-    query GetCartTotals($cartId: String!) {
-        cart(cart_id: $cartId) {
-            id
-            applied_coupons { code }
-            prices {
-                grand_total { value }
-                discounts {
-                    amount { value }
-                    label
-                }
-            }
-        }
-    }
-`;
-
 const Cart = () => {
-    const { cartItems, removeFromCart, addToCart, cartId } = useCart();
+    const { 
+        cartItems, 
+        removeFromCart, 
+        updateQuantity, 
+        cartId, 
+        cartTotals, 
+        appliedCoupons,
+        refetchCart,
+        syncSession
+    } = useCart();
+    const navigate = useNavigate();
     const [couponCode, setCouponCode] = React.useState('');
     const [couponError, setCouponError] = React.useState('');
 
     const [applyCoupon, { loading: applying }] = useMutation(APPLY_COUPON);
     const [removeCoupon, { loading: removing }] = useMutation(REMOVE_COUPON);
 
-    const { data: cartData, refetch: refetchCart } = useQuery(GET_CART_TOTALS, {
-        variables: { cartId },
-        skip: !cartId,
-        fetchPolicy: 'network-only' // Ensure we get latest discounts
-    });
-
-    const subtotal = cartItems.reduce((acc, item) => {
-        const regularPrice = item.product.price_range.minimum_price.regular_price.value;
-        const finalPriceNode = item.product.price_range.minimum_price.final_price;
-        const currentPrice = (finalPriceNode && finalPriceNode.value < regularPrice) ? finalPriceNode.value : regularPrice;
-        return acc + (currentPrice * item.quantity);
-    }, 0);
-
-    const appliedCoupons = cartData?.cart?.applied_coupons || [];
-    const discounts = cartData?.cart?.prices?.discounts || [];
-
-    // If the backend returns a discounted grand_total, use it, otherwise fallback
-    const total = cartData?.cart?.prices?.grand_total?.value || subtotal;
+    const subtotal = cartTotals?.subtotal_excluding_tax?.value || 0;
+    const discounts = cartTotals?.discounts || [];
+    const total = cartTotals?.grand_total?.value || 0;
 
     const handleApplyCoupon = async () => {
         if (!couponCode.trim()) return;
@@ -99,7 +78,7 @@ const Cart = () => {
         try {
             await applyCoupon({ variables: { cartId, couponCode } });
             setCouponCode('');
-            refetchCart();
+            await refetchCart();
         } catch (err) {
             setCouponError(err.message || 'Failed to apply coupon.');
         }
@@ -109,7 +88,7 @@ const Cart = () => {
         setCouponError('');
         try {
             await removeCoupon({ variables: { cartId } });
-            refetchCart();
+            await refetchCart();
         } catch (err) {
             setCouponError(err.message || 'Failed to remove coupon.');
         }
@@ -154,7 +133,7 @@ const Cart = () => {
                                 <div style={{ width: '120px', height: '120px', background: '#f5f5f5', borderRadius: '12px', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     {(item.product.thumbnail?.url || item.product.small_image?.url || item.product.media_gallery?.[0]?.url) ? (
                                         <img
-                                            src={item.product.thumbnail?.url || item.product.small_image?.url || item.product.media_gallery[0].url}
+                                            src={item.product.thumbnail?.url || item.product.small_image?.url || item.product.media_gallery?.[0]?.url}
                                             alt={item.product.name}
                                             style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                                         />
@@ -174,14 +153,15 @@ const Cart = () => {
                                         {/* Quantity Selector */}
                                         <div style={{ display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: '30px', padding: '4px' }}>
                                             <button
-                                                onClick={() => removeFromCart(item.id, 1)}
-                                                style={{ width: '32px', height: '32px', borderRadius: '50%', border: 'none', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}
+                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                disabled={item.quantity <= 1}
+                                                style={{ width: '32px', height: '32px', borderRadius: '50%', border: 'none', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', opacity: item.quantity <= 1 ? 0.5 : 1 }}
                                             >
                                                 <Minus size={14} />
                                             </button>
                                             <span style={{ padding: '0 16px', fontWeight: '700', minWidth: '40px', textAlign: 'center' }}>{item.quantity}</span>
                                             <button
-                                                onClick={() => addToCart(item.product, 1)}
+                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                                 style={{ width: '32px', height: '32px', borderRadius: '50%', border: 'none', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}
                                             >
                                                 <Plus size={14} />
@@ -302,8 +282,12 @@ const Cart = () => {
                                 )}
                             </div>
 
-                            <a
-                                href="/checkout"
+                            <button
+                                onClick={async (e) => {
+                                    e.preventDefault();
+                                    await syncSession();
+                                    navigate('/checkout');
+                                }}
                                 className="button primary"
                                 style={{
                                     display: 'flex',
@@ -316,11 +300,13 @@ const Cart = () => {
                                     borderRadius: '12px',
                                     fontSize: '1.1rem',
                                     fontWeight: '800',
-                                    textDecoration: 'none'
+                                    textDecoration: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer'
                                 }}
                             >
-                                Checkout Now <ArrowRight size={20} />
-                            </a>
+                                Proceed to Checkout <ArrowRight size={20} />
+                            </button>
 
                             <div style={{ marginTop: '24px', display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', background: '#f0fff4', borderRadius: '12px', color: '#00a651', fontSize: '13px' }}>
                                 <ShieldCheck size={20} />

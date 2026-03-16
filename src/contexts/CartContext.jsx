@@ -27,6 +27,10 @@ const MERGE_CARTS = gql`
     mutation MergeCarts($sourceId: String!, $destId: String!) {
         mergeCarts(source_cart_id: $sourceId, destination_cart_id: $destId) {
             id
+            items {
+                uid
+                quantity
+            }
         }
     }
 `;
@@ -35,6 +39,27 @@ const GET_CART = gql`
     query GetCart($cartId: String!) {
         cart(cart_id: $cartId) {
             id
+            total_quantity
+            applied_coupons {
+                code
+            }
+            prices {
+                grand_total {
+                    value
+                    currency
+                }
+                subtotal_excluding_tax {
+                    value
+                    currency
+                }
+                discounts {
+                    amount {
+                        value
+                        currency
+                    }
+                    label
+                }
+            }
             items {
                 uid
                 quantity
@@ -72,13 +97,19 @@ const ADD_TO_CART = gql`
     mutation AddToCart($cartId: String!, $cartItems: [CartItemInput!]!) {
         addProductsToCart(cartId: $cartId, cartItems: $cartItems) {
             cart {
-                items {
-                    uid
-                    quantity
-                    product {
-                        sku
-                    }
-                }
+                id
+                total_quantity
+            }
+        }
+    }
+`;
+
+const UPDATE_CART_ITEMS = gql`
+    mutation UpdateCartItems($cartId: String!, $cartItemInput: [CartItemUpdateInput!]!) {
+        updateCartItems(input: { cart_id: $cartId, cart_items: $cartItemInput }) {
+            cart {
+                id
+                total_quantity
             }
         }
     }
@@ -88,9 +119,8 @@ const REMOVE_FROM_CART = gql`
     mutation RemoveItem($cartId: String!, $itemId: ID!) {
         removeItemFromCart(input: { cart_id: $cartId, cart_item_uid: $itemId }) {
             cart {
-                items {
-                    uid
-                }
+                id
+                total_quantity
             }
         }
     }
@@ -105,12 +135,12 @@ export const CartProvider = ({ children }) => {
         }
         return null;
     });
-    const [cartItems, setCartItems] = useState([]);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const [createCartMutation] = useMutation(CREATE_CART);
     const [addToCartMutation] = useMutation(ADD_TO_CART);
+    const [updateCartItemsMutation] = useMutation(UPDATE_CART_ITEMS);
     const [removeItemMutation] = useMutation(REMOVE_FROM_CART);
     const [mergeCartsMutation] = useMutation(MERGE_CARTS);
 
@@ -120,81 +150,44 @@ export const CartProvider = ({ children }) => {
         fetchPolicy: 'network-only'
     });
 
-    const isStaleCartError = (err) => {
-        const msg = (err?.message || err || "").toLowerCase();
-        return msg.includes('cannot perform operations on cart') || 
-               msg.includes('could not find a cart') ||
-               msg.includes("isn't active");
-    };
-
-    const clearCartAndRecover = () => {
-        console.warn('[CartContext] Clearing stale cart and preparing for recovery...');
-        localStorage.removeItem('cart_id');
-        setCartId(null);
-        setCartItems([]);
-    };
-
-    // Fetch cart data
-    const { data: cartData, refetch: refetchCart, error: cartError } = useQuery(GET_CART, {
-        variables: { cartId: (cartId && cartId !== 'undefined') ? cartId : '' },
-        skip: !cartId || cartId === 'undefined',
-        notifyOnNetworkStatusChange: true,
-        onError: (err) => {
-            console.error('[CartContext] GET_CART Error:', err);
-            if (isStaleCartError(err)) {
-                clearCartAndRecover();
-            }
-        }
+    // Fetch cart data from Magento
+    const { data: cartData, refetch: refetchCart } = useQuery(GET_CART, {
+        variables: { cartId: cartId || '' },
+        skip: !cartId,
+        notifyOnNetworkStatusChange: true
     });
 
-    // Handle Login: Switch to customer cart and merge if needed
+    const cartItems = cartData?.cart?.items?.map(item => ({
+        id: item.uid,
+        product: item.product,
+        quantity: item.quantity
+    })) || [];
+
+    const cartTotals = cartData?.cart?.prices || {
+        grand_total: { value: 0, currency: 'USD' },
+        subtotal_excluding_tax: { value: 0, currency: 'USD' },
+        discounts: []
+    };
+    const totalQuantity = cartData?.cart?.total_quantity || 0;
+    const appliedCoupons = cartData?.cart?.applied_coupons || [];
+
+    // Cookie Bridging for Magento Luma
     useEffect(() => {
-        const handleLogin = async () => {
-            if (user && customerCartData?.customerCart?.id) {
-                const customerCartId = customerCartData.customerCart.id;
-
-                // If we have a guest cart with items, merge it
-                if (cartId && cartId !== customerCartId && cartItems.length > 0) {
-                    try {
-                        console.log(`Merging guest cart ${cartId} into customer cart ${customerCartId}`);
-                        await mergeCartsMutation({
-                            variables: { sourceId: cartId, destId: customerCartId }
-                        });
-                    } catch (err) {
-                        console.error("Failed to merge carts:", err);
-                    }
-                }
-
-                if (cartId !== customerCartId) {
-                    console.log(`[CartContext] Switching to customer cart: ${customerCartId}`);
-                    setCartId(customerCartId);
-                    localStorage.setItem('cart_id', customerCartId);
-                }
-            }
-        };
-        handleLogin();
-    }, [user, customerCartData, cartId, cartItems.length, mergeCartsMutation]);
-
-    // Update cartItems whenever cartData changes
-    useEffect(() => {
-        if (cartData?.cart?.items) {
-            console.log('Cart Items Updated from Server:', cartData.cart.items);
-            setCartItems(cartData.cart.items.map(item => ({
-                id: item.uid,
-                product: item.product,
-                quantity: item.quantity
-            })));
+        if (cartId) {
+            // Set 'cart' cookie that Magento Luma expects for guest carts
+            // Path=/ ensures it is available on all proxied routes like /checkout
+            document.cookie = `cart=${cartId}; path=/; max-age=31536000; SameSite=Lax`;
+            console.log(`[CookieBridge] Syncing cart cookie: ${cartId}`);
         }
-    }, [cartData]);
+    }, [cartId]);
 
+    // Initialize Cart
     useEffect(() => {
         const initCart = async () => {
-            const isValid = cartId && cartId !== 'undefined' && cartId !== 'null' && cartId.trim() !== '';
-            if (!user && !isValid) {
+            if (!cartId && !user) {
                 try {
                     const res = await createCartMutation();
                     const id = res.data.createEmptyCart;
-                    console.log('New Guest Cart Created:', id);
                     if (id) {
                         setCartId(id);
                         localStorage.setItem('cart_id', id);
@@ -207,52 +200,44 @@ export const CartProvider = ({ children }) => {
         initCart();
     }, [cartId, createCartMutation, user]);
 
-    const addToCart = async (product, quantity = 1, selectedOptions = {}) => {
-        console.log('addToCart called with:', { sku: product?.sku, qty: quantity, cartId, selectedOptions });
+    // Handle Login merge
+    useEffect(() => {
+        const handleMerge = async () => {
+            if (user && customerCartData?.customerCart?.id) {
+                const customerCartId = customerCartData.customerCart.id;
+                
+                // If we have a guest cart that isn't the customer cart, merge them
+                if (cartId && cartId !== customerCartId) {
+                    try {
+                        console.log(`Merging guest cart ${cartId} into customer cart ${customerCartId}`);
+                        await mergeCartsMutation({
+                            variables: { sourceId: cartId, destId: customerCartId }
+                        });
+                    } catch (err) {
+                        console.error("Failed to merge carts:", err);
+                    }
+                }
 
-        if (!cartId || cartId === 'undefined' || !product?.sku) {
-            console.error('Missing valid cartId or product SKU', { cartId, sku: product?.sku });
-            return;
-        }
-        setLoading(true);
-        try {
-            const parentSku = product.sku;
-
-            // Determine SKU for stock validation (variant SKU if options selected)
-            let validationSku = parentSku;
-            if (Object.keys(selectedOptions).length > 0 && product.variants) {
-                const variant = product.variants.find(v =>
-                    v.attributes.every(attr => selectedOptions[attr.code] === attr.value_index)
-                );
-                if (variant) {
-                    validationSku = variant.product.sku;
-                    console.log(`[CartDebug] Using variant SKU for validation: ${validationSku}`);
+                if (cartId !== customerCartId) {
+                    setCartId(customerCartId);
+                    localStorage.setItem('cart_id', customerCartId);
+                    refetchCart();
                 }
             }
+        };
+        handleMerge();
+    }, [user, customerCartData, cartId, mergeCartsMutation, refetchCart]);
 
-            // Check stock first
-            const maxQtyFromApi = await getSalableQty(validationSku);
-            const maxQty = (maxQtyFromApi === null || maxQtyFromApi === undefined) ? product.only_x_left_in_stock : maxQtyFromApi;
-
-            const existingQty = cartItems
-                .filter(item => item.product.sku === validationSku)
-                .reduce((acc, item) => acc + item.quantity, 0);
-
-            console.log(`[CartDebug] Adding ${validationSku}: request=${quantity}, current=${existingQty}, limit=${maxQty}`);
-
-            if (maxQty !== null && maxQty !== undefined && (existingQty + quantity) > maxQty) {
-                window.alert(`Only ${maxQty} item available in stock`);
-                setLoading(false);
-                return;
-            }
-
-            // Prepare cart item input
+    const addToCart = async (product, quantity = 1, selectedOptions = {}) => {
+        if (!cartId || !product?.sku) return;
+        setLoading(true);
+        try {
             const cartItemInput = {
-                sku: parentSku,
+                sku: product.sku,
                 quantity: parseFloat(quantity)
             };
 
-            // Add selected options if configurable
+            // Handle configurable options if present
             if (Object.keys(selectedOptions).length > 0 && product.configurable_options) {
                 const optionUids = [];
                 product.configurable_options.forEach(opt => {
@@ -267,31 +252,14 @@ export const CartProvider = ({ children }) => {
                 }
             }
 
-            console.log('Sending addProductsToCart mutation with payload:', cartItemInput);
             await addToCartMutation({
-                variables: {
-                    cartId,
-                    cartItems: [cartItemInput]
-                }
+                variables: { cartId, cartItems: [cartItemInput] }
             });
-
             await refetchCart();
             setIsCartOpen(true);
         } catch (err) {
             console.error('Error adding to cart:', err);
-            let errorMessage = 'Failed to add product to cart. Please try again.';
-            
-            if (err.graphQLErrors && err.graphQLErrors.length > 0) {
-                errorMessage = err.graphQLErrors[0].message;
-                
-                // Check for stale cart errors
-                if (isStaleCartError(errorMessage)) {
-                   clearCartAndRecover();
-                   errorMessage = 'Your cart session has expired. We have refreshed it, please try adding the item again.';
-                }
-            }
-            
-            window.alert(errorMessage);
+            window.alert(err.message || 'Failed to add to cart');
         } finally {
             setLoading(false);
         }
@@ -299,32 +267,77 @@ export const CartProvider = ({ children }) => {
 
     const removeFromCart = async (itemId) => {
         if (!cartId) return;
+        setLoading(true);
         try {
             await removeItemMutation({
                 variables: { cartId, itemId }
             });
             await refetchCart();
         } catch (err) {
-            console.error('Error removing item:', err);
+            console.error('Error removing from cart:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const updateQuantity = async (itemId, quantity) => {
+        if (!cartId || quantity < 1) return;
+        setLoading(true);
+        try {
+            await updateCartItemsMutation({
+                variables: {
+                    cartId,
+                    cartItemInput: [{ cart_item_uid: itemId, quantity: parseFloat(quantity) }]
+                }
+            });
+            await refetchCart();
+        } catch (err) {
+            console.error('Error updating quantity:', err);
+        } finally {
+            setLoading(false);
         }
     };
 
     const clearCart = () => {
         setCartId(null);
         localStorage.removeItem('cart_id');
-        setCartItems([]);
+    };
+
+    const syncSession = async () => {
+        try {
+            // Poke Magento sections to warm up the session and ensure cookies are established
+            // We fetch the cart, checkout-data, and customer sections specifically
+            const response = await fetch('/customer/section/load?sections=cart,checkout-data,customer', {
+                headers: { 
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Cache-Control': 'no-cache'
+                }
+            });
+            const data = await response.json();
+            console.log('[SessionSync] Magento session sections "warmed up":', Object.keys(data));
+            
+            // If Magento returned a new form_key, it will be in the cookies handled by the proxy
+        } catch (err) {
+            console.error('[SessionSync] Failed to sync session:', err);
+        }
     };
 
     return (
         <CartContext.Provider value={{
             cartId,
             cartItems,
+            cartTotals,
+            totalQuantity,
+            appliedCoupons,
             addToCart,
             removeFromCart,
+            updateQuantity,
             clearCart,
             isCartOpen,
             setIsCartOpen,
-            loading
+            loading,
+            refetchCart,
+            syncSession
         }}>
             {loading && <LoadingOverlay />}
             {children}

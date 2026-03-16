@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { X, Trash2 } from 'lucide-react';
 
 const MiniCart = () => {
-    const { isCartOpen, setIsCartOpen, cartItems, removeFromCart } = useCart();
+    const { isCartOpen, setIsCartOpen, cartItems, removeFromCart, cartTotals, totalQuantity, syncSession } = useCart();
     const overlayRef = useRef(null);
 
     // Close on click outside
@@ -24,13 +24,6 @@ const MiniCart = () => {
     }, [isCartOpen, setIsCartOpen]);
 
     if (!isCartOpen) return null;
-
-    const total = cartItems.reduce((acc, item) => {
-        const regularPrice = item.product.price_range.minimum_price.regular_price.value;
-        const finalPriceNode = item.product.price_range.minimum_price.final_price;
-        const currentPrice = (finalPriceNode && finalPriceNode.value < regularPrice) ? finalPriceNode.value : regularPrice;
-        return acc + (currentPrice * item.quantity);
-    }, 0);
 
     return (
         <div style={{
@@ -56,7 +49,7 @@ const MiniCart = () => {
                 animation: 'slideIn 0.3s ease-out'
             }}>
                 <div style={{ padding: '20px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h2 style={{ fontSize: '1.2rem', margin: 0 }}>Shopping Cart ({cartItems.length})</h2>
+                    <h2 style={{ fontSize: '1.2rem', margin: 0 }}>Shopping Cart ({totalQuantity})</h2>
                     <button onClick={() => setIsCartOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
                         <X size={24} />
                     </button>
@@ -73,9 +66,7 @@ const MiniCart = () => {
                                 item.product.media_gallery?.[0]?.url ||
                                 null;
 
-                            const regularPrice = item.product.price_range.minimum_price.regular_price.value;
-                            const finalPriceNode = item.product.price_range.minimum_price.final_price;
-                            const currentPrice = (finalPriceNode && finalPriceNode.value < regularPrice) ? finalPriceNode.value : regularPrice;
+                            const itemPrice = item.product.price_range.minimum_price.final_price;
 
                             return (
                                 <div key={item.id} style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
@@ -93,8 +84,7 @@ const MiniCart = () => {
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '5px' }}>
                                             <span style={{ fontSize: '0.9rem', color: '#666' }}>Qty: {item.quantity}</span>
                                             <span style={{ fontWeight: 'bold' }}>
-                                                {item.product.price_range.minimum_price.regular_price.currency}
-                                                {(currentPrice * item.quantity).toFixed(2)}
+                                                {itemPrice?.currency} {((itemPrice?.value || 0) * item.quantity).toFixed(2)}
                                             </span>
                                         </div>
 
@@ -114,7 +104,9 @@ const MiniCart = () => {
                 <div style={{ padding: '20px', borderTop: '1px solid #eee', backgroundColor: '#f9f9f9' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px', fontWeight: 'bold', fontSize: '1.1rem' }}>
                         <span>Subtotal:</span>
-                        <span>${total.toFixed(2)}</span>
+                        <span>
+                            {cartTotals?.grand_total?.currency} {(cartTotals?.grand_total?.value || 0).toFixed(2)}
+                        </span>
                     </div>
                     <Link
                         to="/cart"
@@ -126,7 +118,11 @@ const MiniCart = () => {
                     </Link>
                     <a
                         href="/checkout"
-                        onClick={() => setIsCartOpen(false)}
+                        onClick={async (e) => {
+                            e.preventDefault();
+                            await syncSession();
+                            window.location.href = '/checkout';
+                        }}
                         className="button primary"
                         style={{ display: 'block', textAlign: 'center', width: '100%', padding: '12px', borderRadius: '4px', textDecoration: 'none' }}
                     >
